@@ -4,7 +4,7 @@ const axios = require("axios");
 const FormData = require("form-data");
 const XLSX = require("xlsx");
 const path = require("path");
-require("dotenv").config(); // Load environment variables from .env file
+require("dotenv").config();
 
 const app = express();
 const port = 3000;
@@ -28,9 +28,24 @@ async function sendSMS(row) {
 	form.append("call", "sendsms");
 	form.append("businessid", process.env.BUSINESS_ID);
 	form.append("businessId", process.env.BUSINESS_ID);
-	form.append("userid", process.env.USER_ID);
-	form.append("userId", process.env.USER_ID);
+	form.append("userid", process.env.USER_ID); // Use the environment variable
+	form.append("userId", process.env.USER_ID); // Use the environment variable
 	form.append("apiKey", process.env.API_KEY); // Use the environment variable
+	form.append("number", `+1${phoneNumber}`);
+	form.append(
+		"message",
+		`Hi ${name}, We noticed you recently expressed interest in our cutting-edge Software Development program at TECH IS. We're thrilled about your enthusiasm!
+
+Would you be open to a brief 10-15 minute conversation to explore how this program could accelerate your career in tech? We're confident that our program offers unique benefits that you won't want to miss.
+
+To make it easy for you, here's a Google Meet link [https://meet.google.com/foi-bmch-dtq]  for a virtual meeting. Feel free to click on it at a time that's convenient for you, or let us know when you're available.
+
+Looking forward to your positive response.
+
+Best regards,
+TECH IS
+        `
+	);
 
 	try {
 		const response = await axios.post("https://apig.kixie.com/itn/sendmms", form, {
@@ -39,10 +54,9 @@ async function sendSMS(row) {
 			},
 		});
 		count += 1;
-		console.log("businessid", process.env.BUSINESS_ID, "userid", process.env.USER_ID, "apiKey", process.env.API_KEY);
-		console.log(`Successfully sent SMS to ${name} at ${phoneNumber}: `, "sent =", " count is :", count);
+		console.log(`Successfully sent SMS to ${name} at ${phoneNumber}: `, "sent =", response.data, " count is :", count);
 	} catch (error) {
-		console.log(`Failed to send SMS to ${name} at ${phoneNumber}: `);
+		console.log(`Failed to send SMS to ${name} at ${phoneNumber}: `, error);
 	}
 }
 

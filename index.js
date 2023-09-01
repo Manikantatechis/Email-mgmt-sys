@@ -41,6 +41,9 @@ async function sendSMS(row) {
 		});
 		count += 1;
 		console.log(`Successfully sent SMS to ${name} at ${phoneNumber}: `, "sent =", response.data, " count is :", count);
+		if(!response.data){
+			throw new Error("something went wrong")
+		}
 	} catch (error) {
 		console.log(`Failed to send SMS to ${name} at ${phoneNumber}: `, error);
 	}

@@ -1,0 +1,26 @@
+# Dependency directories
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+
+# Editor-specific files
+.vscode/
+.idea/
+
+# WebStorm workspace settings
+.idea/workspace.xml
+
+# Build and distribution directories
+dist/
+out/

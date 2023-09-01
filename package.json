@@ -1,0 +1,27 @@
+{
+	"name": "kixie-sms",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "nodemon index.js",
+		"start": "node app.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"axios": "^1.5.0",
+		"csv-parse": "^5.5.0",
+		"dotenv": "^16.3.1",
+		"express": "^4.18.2",
+		"form-data": "^4.0.0",
+		"fs": "^0.0.1-security",
+		"multer": "^1.4.5-lts.1",
+		"xlsx": "^0.18.5"
+	},
+	"devDependencies": {
+		"nodemon": "^3.0.1"
+	}
+}

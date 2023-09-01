@@ -32,7 +32,6 @@ async function sendSMS(row) {
 	form.append("userId", process.env.USER_ID);
 	form.append("apiKey", process.env.API_KEY); // Use the environment variable
 
-
 	try {
 		const response = await axios.post("https://apig.kixie.com/itn/sendmms", form, {
 			headers: {
@@ -40,9 +39,8 @@ async function sendSMS(row) {
 			},
 		});
 		count += 1;
-		console.log("form", form)
+		console.log("businessid", process.env.BUSINESS_ID, "userid", process.env.USER_ID, "apiKey", process.env.API_KEY);
 		console.log(`Successfully sent SMS to ${name} at ${phoneNumber}: `, "sent =", " count is :", count);
-
 	} catch (error) {
 		console.log(`Failed to send SMS to ${name} at ${phoneNumber}: `);
 	}

@@ -23,11 +23,15 @@ import {
 import MainCard from 'components/MainCard';
 import Transitions from 'components/@extended/Transitions';
 import ProfileTab from './ProfileTab';
-import SettingTab from './SettingTab';
+// import SettingTab from './SettingTab';
+import {useNavigate} from "react-router-dom"
 
 // assets
-import avatar1 from 'assets/images/users/avatar-1.png';
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+// import avatar1 from 'assets/images/users/avatar-1.png';
+import { LogoutOutlined, 
+  // SettingOutlined, 
+  UserOutlined } from '@ant-design/icons';
+import { userLogout } from 'services/authService';
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -55,9 +59,13 @@ function a11yProps(index) {
 
 const Profile = () => {
   const theme = useTheme();
-
+  const navigate = useNavigate();
   const handleLogout = async () => {
-    // logout
+    const res = await userLogout();
+    if (res) {
+      localStorage.clear();
+      navigate('/login');
+    }
   };
 
   const anchorRef = useRef(null);
@@ -72,6 +80,8 @@ const Profile = () => {
     }
     setOpen(false);
   };
+  const userName = JSON.parse(localStorage.getItem('userData'))?.first_name; // This should come from your actual user data
+  const avatarSrc = null;
 
   const [value, setValue] = useState(0);
 
@@ -80,6 +90,15 @@ const Profile = () => {
   };
 
   const iconBackColorOpen = 'grey.300';
+
+  const renderAvatar = () => {
+    if (avatarSrc) {
+      return <Avatar alt="profile user" src={avatarSrc} sx={{ width: 32, height: 32 }} />;
+    } else {
+      const initial = userName ? userName.charAt(0).toUpperCase() : '?';
+      return <Avatar sx={{ width: 32, height: 32 }}>{initial}</Avatar>;
+    }
+  };
 
   return (
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
@@ -97,8 +116,8 @@ const Profile = () => {
         onClick={handleToggle}
       >
         <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
-          <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
-          <Typography variant="subtitle1">John Doe</Typography>
+          {renderAvatar()}
+          <Typography variant="subtitle1">{userName}</Typography>
         </Stack>
       </ButtonBase>
       <Popper
@@ -139,12 +158,12 @@ const Profile = () => {
                       <Grid container justifyContent="space-between" alignItems="center">
                         <Grid item>
                           <Stack direction="row" spacing={1.25} alignItems="center">
-                            <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
+                            {renderAvatar()}
                             <Stack>
-                              <Typography variant="h6">John Doe</Typography>
-                              <Typography variant="body2" color="textSecondary">
+                              <Typography variant="h6">{userName}</Typography>
+                              {/* <Typography variant="body2" color="textSecondary">
                                 UI/UX Designer
-                              </Typography>
+                              </Typography> */}
                             </Stack>
                           </Stack>
                         </Grid>
@@ -171,7 +190,7 @@ const Profile = () => {
                               label="Profile"
                               {...a11yProps(0)}
                             />
-                            <Tab
+                            {/* <Tab
                               sx={{
                                 display: 'flex',
                                 flexDirection: 'row',
@@ -182,15 +201,15 @@ const Profile = () => {
                               icon={<SettingOutlined style={{ marginBottom: 0, marginRight: '10px' }} />}
                               label="Setting"
                               {...a11yProps(1)}
-                            />
+                            /> */}
                           </Tabs>
                         </Box>
                         <TabPanel value={value} index={0} dir={theme.direction}>
                           <ProfileTab handleLogout={handleLogout} />
                         </TabPanel>
-                        <TabPanel value={value} index={1} dir={theme.direction}>
+                        {/* <TabPanel value={value} index={1} dir={theme.direction}>
                           <SettingTab />
-                        </TabPanel>
+                        </TabPanel> */}
                       </>
                     )}
                   </MainCard>

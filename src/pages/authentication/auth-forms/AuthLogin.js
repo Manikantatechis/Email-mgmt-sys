@@ -27,7 +27,11 @@ import AnimateButton from 'components/@extended/AnimateButton';
 // assets
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
-// ============================|| FIREBASE - LOGIN ||============================ //
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { loginUser } from 'store/auth/authThunks';
+
+// ============================||LOGIN ||============================ //
 
 const AuthLogin = () => {
   const [checked, setChecked] = React.useState(false);
@@ -40,13 +44,14 @@ const AuthLogin = () => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-
+const navigate = useNavigate()
+const dispatch = useDispatch()
   return (
     <>
       <Formik
         initialValues={{
-          email: 'info@codedthemes.com',
-          password: '123456',
+          email: '',
+          password: '',
           submit: null
         }}
         validationSchema={Yup.object().shape({
@@ -56,6 +61,15 @@ const AuthLogin = () => {
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
             setStatus({ success: false });
+            const response = await dispatch(loginUser({...values}));
+            if (response) {
+              console.log(response.type === 'auth/loginUser/fulfilled');
+              setStatus({ success: true });
+              setErrors({ submit: true });
+              navigate("/")
+            } else {
+              setErrors({ submit: 'Invalid credentials' });
+            }
             setSubmitting(false);
           } catch (err) {
             setStatus({ success: false });

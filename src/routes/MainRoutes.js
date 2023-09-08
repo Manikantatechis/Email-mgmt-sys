@@ -16,6 +16,7 @@ const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/SamplePage')));
 
 // ==============================|| MAIN ROUTING ||============================== //
+import AuthRoute from './AuthRoute'; // Adjust the import to your folder structure
 
 const MainRoutes = {
   path: '/',
@@ -23,15 +24,22 @@ const MainRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardDefault />
+      element: (
+        <AuthRoute>
+          <DashboardDefault />
+        </AuthRoute>
+      )
     },
-
     {
       path: 'dashboard',
       children: [
         {
           path: 'default',
-          element: <DashboardDefault />
+          element: (
+            <AuthRoute>
+              <DashboardDefault />
+            </AuthRoute>
+          )
         }
       ]
     },
@@ -41,21 +49,43 @@ const MainRoutes = {
     },
     {
       path: 'sample-page',
-      element: <SamplePage />
+      element: (
+        <AuthRoute>
+          <SamplePage />
+        </AuthRoute>
+      )
     },
     {
       path: 'users',
-      element: <UserList />
+      element: (
+        <AuthRoute>
+          <UserList />
+        </AuthRoute>
+      )
     },
     {
       path: 'send',
-      element: <DataPreview />
-    },{
-      path:"credentials",
-      element:<CredentialManager />
-    },{
-      path:"template",
-      element:<TemplateManager />
+      element: (
+        <AuthRoute>
+          <DataPreview />
+        </AuthRoute>
+      )
+    },
+    {
+      path: 'credentials',
+      element: (
+        <AuthRoute>
+          <CredentialManager />
+        </AuthRoute>
+      )
+    },
+    {
+      path: 'template',
+      element: (
+        <AuthRoute>
+          <TemplateManager />
+        </AuthRoute>
+      )
     }
   ]
 };

@@ -7,5 +7,7 @@ import MainRoutes from './MainRoutes';
 // ==============================|| ROUTING RENDER ||============================== //
 
 export default function ThemeRoutes() {
+  // The order matters; make sure to structure the routes correctly
   return useRoutes([MainRoutes, LoginRoutes]);
+
 }

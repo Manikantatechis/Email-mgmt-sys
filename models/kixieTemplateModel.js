@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const HtmlTemplateSchema = new Schema(
+const KixieTemplateSchema = new Schema(
 	{
 		name: {
 			type: String,
@@ -12,6 +12,10 @@ const HtmlTemplateSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: "User", // Assume you have a User model
 			required: [true, "User ID is required"],
+		},
+		content: {
+			type: String,
+			required: [true, "Content is required"],
 		},
 		status: {
 			type: String,
@@ -24,24 +28,12 @@ const HtmlTemplateSchema = new Schema(
 			enum: ["email", "webpage"],
 			required: [true, "Type is required"],
 		},
-		content: {
-			type: String,
-		},
-		html: {
-			type: String,
-		},
 	},
 	{
 		timestamps: true, // Automatically includes createdAt and updatedAt fields
-		validate: {
-			validator: function () {
-				return !!(this.content || this.html);
-			},
-			message: "Either content or html must be provided",
-		},
 	}
 );
 
-const HtmlTemplate = mongoose.model("HtmlTemplate", HtmlTemplateSchema);
+const KixieTemplate = mongoose.model("KixieTemplate", KixieTemplateSchema);
 
-module.exports = HtmlTemplate;
+module.exports = KixieTemplate;

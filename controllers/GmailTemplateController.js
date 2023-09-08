@@ -1,8 +1,9 @@
 const asyncHandler = require("express-async-handler");
-const HtmlTemplate = require("../models/htmlTemplateModel"); // Replace with the actual path to your model
+const GmailTemplate = require("../models/gmailTemplateModel"); // Replace with the actual path to your model
 
-exports.addHtmlTemplate = asyncHandler(async (req, res, next) => {
+const addGmailTemplate = asyncHandler(async (req, res, next) => {
 	const { role, userId } = req;
+	console.log(role)
 	if (role !== "manager" && role !== "director") {
 		throw new Error("Access forbidden: insufficient role");
 	}
@@ -12,7 +13,7 @@ exports.addHtmlTemplate = asyncHandler(async (req, res, next) => {
 		throw new Error("Missing required fields");
 	}
 
-	const newTemplate = new HtmlTemplate({
+	const newTemplate = new GmailTemplate({
 		name,
 		userId,
 		status,
@@ -22,20 +23,31 @@ exports.addHtmlTemplate = asyncHandler(async (req, res, next) => {
 	});
 
 	await newTemplate.save();
-	res.status(201).json({ message: "HTML Template created", data: newTemplate });
+	res.status(201).json(newTemplate);
 });
 
-exports.listHtmlTemplates = asyncHandler(async (req, res, next) => {
+const listGmailTemplates = asyncHandler(async (req, res, next) => {
 	const { role } = req;
 	if (role !== "manager" && role !== "director") {
 		throw new Error("Access forbidden: insufficient role");
 	}
 
-	const templates = await HtmlTemplate.find();
-	res.status(200).json({ data: templates });
+	const templates = await GmailTemplate.find();
+	res.status(200).json(templates);
 });
 
-exports.editHtmlTemplate = asyncHandler(async (req, res, next) => {
+// Function to retrieve a specific Gmail template by ID
+const getTemplateNames = asyncHandler(async (req, res) => {
+	const template = await GmailTemplate.find({}).select("_id name");
+
+	if (!template) {
+		return res.status(404).json({ error: "Template not found" });
+	}
+
+	res.status(200).json(template);
+});
+
+const editGmailTemplate = asyncHandler(async (req, res, next) => {
 	const { role, userId } = req;
 	if (role !== "manager" && role !== "director") {
 		throw new Error("Access forbidden: insufficient role");
@@ -44,15 +56,15 @@ exports.editHtmlTemplate = asyncHandler(async (req, res, next) => {
 	const { id } = req.params; // Template ID from URL
 	const updates = req.body;
 
-	const template = await HtmlTemplate.findOneAndUpdate({ _id: id, userId }, updates, { new: true });
+	const template = await GmailTemplate.findOneAndUpdate({ _id: id, userId }, updates, { new: true });
 	if (!template) {
-		throw new Error("HTML Template not found");
+		throw new Error("GMAIL Template not found");
 	}
 
-	res.status(200).json({ message: "HTML Template updated", data: template });
+	res.status(200).json(template);
 });
 
-exports.deleteHtmlTemplate = asyncHandler(async (req, res, next) => {
+const deleteGmailTemplate = asyncHandler(async (req, res, next) => {
 	const { role, userId } = req;
 	if (role !== "manager" && role !== "director") {
 		throw new Error("Access forbidden: insufficient role");
@@ -60,10 +72,12 @@ exports.deleteHtmlTemplate = asyncHandler(async (req, res, next) => {
 
 	const { id } = req.params; // Template ID from URL
 
-	const template = await HtmlTemplate.findOneAndDelete({ _id: id, userId });
+	const template = await GmailTemplate.findOneAndDelete({ _id: id, userId });
 	if (!template) {
-		throw new Error("HTML Template not found");
+		throw new Error("GMAIL Template not found");
 	}
 
-	res.status(200).json({ message: "HTML Template deleted", data: template });
+	res.status(200).json({ message: "GMAIL Template deleted" });
 });
+
+module.exports = { addGmailTemplate, listGmailTemplates, editGmailTemplate, deleteGmailTemplate, getTemplateNames };

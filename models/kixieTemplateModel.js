@@ -23,11 +23,6 @@ const KixieTemplateSchema = new Schema(
 			default: "active",
 			required: [true, "Status is required"],
 		},
-		type: {
-			type: String,
-			enum: ["email", "webpage"],
-			required: [true, "Type is required"],
-		},
 	},
 	{
 		timestamps: true, // Automatically includes createdAt and updatedAt fields

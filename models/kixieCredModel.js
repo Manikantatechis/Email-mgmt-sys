@@ -68,9 +68,7 @@ KixieCredentialsSchema.post("find", function (docs) {
 			let decrypted = decipher.update(encryptedData, "hex", "utf8");
 			decrypted += decipher.final("utf8");
 			doc.apiKey = decrypted;
-		} else {
-			console.warn("apiKey is undefined for document:", doc._id);
-		}
+		} 
 	});
 });
 

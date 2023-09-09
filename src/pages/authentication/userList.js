@@ -4,11 +4,13 @@ import { Button, Container, Paper, Table, TableBody, TableCell, TableHead, Table
 import { EditOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { listUsers } from 'store/auth/authThunks';
-import { selectUserList } from 'store/auth/authSlice';
+import { selectIsLoading, selectUserList } from 'store/auth/authSlice';
+import Loader from 'components/Loader';
 
 const UserList = () => {
   const users = useSelector(selectUserList)
 const dispatch = useDispatch()
+const isLoading = useSelector(selectIsLoading)
 
   useEffect(()=>{
     dispatch(listUsers())
@@ -16,10 +18,11 @@ const dispatch = useDispatch()
 
   return (
     <Container>
-      <Paper elevation={3} style={{ borderRadius: '15px', height: '70vh', overflowY:"scroll" }}>
+      <Paper elevation={3} style={{ borderRadius: '15px', height: '70vh', overflowY: 'scroll' }}>
         <Typography variant="h6" component="div" style={{ padding: '16px', textAlign: 'center' }}>
           User List
         </Typography>
+        <Container style={{ width: '100%', padding: 0 }}>{isLoading && <Loader />}</Container>
         <Table>
           <TableHead>
             <TableRow>
@@ -30,20 +33,22 @@ const dispatch = useDispatch()
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {users && users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.first_name + " " + user.last_name}</TableCell>
-                <TableCell>{user.role || "user"}</TableCell>
-                <TableCell>{user.status || "Active"}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Button variant="contained" color="primary" startIcon={<EditOutlined />}>
-                    Edit
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {users &&
+              users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.first_name + ' ' + user.last_name}</TableCell>
+                  <TableCell>{user.role || 'user'}</TableCell>
+                  <TableCell>{user.status || 'Active'}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <Button variant="contained" color="primary" startIcon={<EditOutlined />}>
+                      Edit, 
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </Paper>

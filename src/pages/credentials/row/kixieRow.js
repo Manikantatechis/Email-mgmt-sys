@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TableRow, TableCell, Button, Select, MenuItem } from '@mui/material';
 import { EditOutlined } from '@ant-design/icons';
 
-const KixieRow = ({ id, name, phoneNo, status }) => {
+const KixieRow = ({ id, name, phone, status, index }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newStatus, setNewStatus] = useState(status);
 
@@ -12,8 +12,9 @@ const KixieRow = ({ id, name, phoneNo, status }) => {
 
   return (
     <TableRow key={id}>
+      <TableCell style={{ width: '10%' }}>{index}</TableCell>
       <TableCell style={{ width: '30%' }}>{name}</TableCell>
-      <TableCell style={{ width: '30%' }}>{phoneNo}</TableCell>
+      <TableCell style={{ width: '30%' }}>{phone}</TableCell>
       <TableCell style={{ width: '20%' }}>
         {isEditing ? (
           <Select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
@@ -21,7 +22,7 @@ const KixieRow = ({ id, name, phoneNo, status }) => {
             <MenuItem value="Inactive">Inactive</MenuItem>
           </Select>
         ) : (
-          status
+          status || 'Active'
         )}
       </TableCell>
       <TableCell style={{ width: '20%' }}>

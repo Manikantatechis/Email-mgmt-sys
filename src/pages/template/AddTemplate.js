@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Grid, InputLabel, OutlinedInput, FormHelperText, Stack, Container, Paper, Select, MenuItem } from '@mui/material';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
+import { addGmailTemplate, addKixieTemplate } from 'services/templateService';
 
 const AddTemplate = ({ actionType, setActionType }) => {
   const [preview, setPreview] = useState('');
@@ -15,9 +16,38 @@ const AddTemplate = ({ actionType, setActionType }) => {
     }),
     content: Yup.string().required('Content is required')
   });
+const handleSubmit = async (values) => {
+  try {
+    // Create a new object based on the condition for the type
+    let payload = { ...values };
+    if (values.type === 'html') {
+      payload.html = payload.content;
+      delete payload.content;
+    }
+
+    let actionFunction = {
+      gmail: addGmailTemplate,
+      kixie: addKixieTemplate
+    }[actionType];
+
+    if (actionFunction) {
+      const res = await actionFunction(payload); // Use payload instead of values
+      console.log(res);
+      if (res && !res.message) {
+        setActionType(null);
+      }
+    } else {
+      console.warn(`Invalid actionType: ${actionType}`);
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
+
 
   return (
-    <Container style={{ position: 'fixed', top: '20%', width: '70%', height:"70vh", overflow:"scroll"}}>
+    <Container style={{ position: 'fixed', top: '20%', width: '70%', height: '70vh', overflow: 'scroll' }}>
       <Paper elevation={3} style={{ padding: '30px' }}>
         {actionType && (
           <Formik
@@ -29,7 +59,7 @@ const AddTemplate = ({ actionType, setActionType }) => {
             }}
             validationSchema={validationSchema}
             onSubmit={(values, { setSubmitting }) => {
-              console.log('Submitting values', values);
+              handleSubmit(values);
               setSubmitting(false);
             }}
           >
@@ -54,20 +84,27 @@ const AddTemplate = ({ actionType, setActionType }) => {
                   <Grid item xs={12}>
                     <Stack spacing={1}>
                       <InputLabel htmlFor="status">Status</InputLabel>
-                      <OutlinedInput
+                      <Select
+                        variant="outlined"
                         id="status"
                         name="status"
                         value={values.status}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         error={Boolean(touched.status && errors.status)}
-                      />
+                      >
+                        <MenuItem value={"active"}>Active</MenuItem>
+                        <MenuItem value={"inactive"}>In Active</MenuItem>
+                      </Select>
                       {errors.status && touched.status && <FormHelperText error>{errors.status}</FormHelperText>}
                     </Stack>
                   </Grid>
 
                   {actionType === 'gmail' && (
                     <>
+                      <Container color="primary" sx={{ position: 'absolute', textAlign: 'center', fontWeight: 'bold' }}>
+                        Add Gmail Template
+                      </Container>
                       <Grid item xs={12}>
                         <Stack spacing={1}>
                           <InputLabel htmlFor="type">Type</InputLabel>
@@ -104,6 +141,9 @@ const AddTemplate = ({ actionType, setActionType }) => {
 
                   {actionType === 'kixie' && (
                     <>
+                      <Container color="primary" sx={{ position: 'absolute', textAlign: 'center', fontWeight: 'bold' }}>
+                        Add Kixie Template
+                      </Container>
                       <Grid item xs={12}>
                         <Stack spacing={1}>
                           <InputLabel htmlFor="content">Content</InputLabel>

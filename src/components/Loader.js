@@ -4,10 +4,10 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 // loader style
 const LoaderWrapper = styled('div')(({ theme }) => ({
-  position: 'fixed',
+  position: 'relative',
   top: 0,
   left: 0,
-  zIndex: 2001,
+  zIndex: 1100,
   width: '100%',
   '& > * + *': {
     marginTop: theme.spacing(2)

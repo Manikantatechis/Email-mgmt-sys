@@ -1,21 +1,23 @@
+import Loader from 'components/Loader';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { checkLogin } from 'services/authService';
-import { selectIsAuthenticated } from 'store/auth/authSlice';
+import { loginStatus, selectIsAuthenticated } from 'store/auth/authSlice';
 
 const AuthRoute = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(undefined);
 
   const isLoggedIn = useSelector(selectIsAuthenticated);
-
+  const dispatch = useDispatch();
   // Function to check login status
   const checkLoginStatus = async () => {
     if (isLoggedIn) {
       setIsAuthenticated(true);
     } else {
       const isAuthenticated = await checkLogin();
-      setIsAuthenticated(isAuthenticated);
+      dispatch(loginStatus(isAuthenticated));
+      setIsAuthenticated(isAuthenticated || false);
     }
   };
 
@@ -26,7 +28,7 @@ const AuthRoute = ({ children }) => {
 
   if (isAuthenticated === undefined) {
     // Authentication status is still being checked, you can show a loading spinner or message here
-    return <div>Loading...</div>;
+    return <div style={{position:"fixed", top:0, left:0}}><Loader /></div>;
   }
 
   if (isAuthenticated) {

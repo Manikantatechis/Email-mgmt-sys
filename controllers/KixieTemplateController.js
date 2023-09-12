@@ -39,7 +39,7 @@ exports.getAllTemplates = asyncHandler(async (req, res) => {
 
 // Function to retrieve a specific Kixie template by ID
 exports.getTemplateNames = asyncHandler(async (req, res) => {
-	const template = await KixieTemplate.findById({}).select("_id name");
+	const template = await KixieTemplate.find({}).select("_id name");
 
 	if (!template) {
 		return res.status(404).json({ error: "Template not found" });

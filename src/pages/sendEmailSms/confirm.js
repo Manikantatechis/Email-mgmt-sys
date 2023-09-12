@@ -1,26 +1,102 @@
-import React, { useState } from 'react';
-import { Grid, InputLabel, FormControl, Button, Stack, Select, MenuItem } from '@mui/material';
-import { Container } from '../../../node_modules/@mui/material/index';
 
-const Confirm = ({ actionType, setActionType }) => {
+import React, { useEffect, useState } from 'react';
+import { Grid, InputLabel, FormControl, Button, Stack, Select, MenuItem, Container, CircularProgress } from '@mui/material';
+import { getGmailTemplatesNames, getKixieTemplatesNames } from 'services/templateService';
+import { getGmailCredNames, getKixieCredNames } from 'services/credentialsService';
+
+const SMS = 'sms';
+const EMAIL = 'email';
+const BOTH = 'both';
+
+const Dropdown = ({ label, id, value, onChange, options, isLoading }) => (
+  <Grid item xs={12}>
+    <Stack spacing={1}>
+      <InputLabel htmlFor={id}>{label}</InputLabel>
+      <FormControl variant="outlined" fullWidth>
+        <Select labelId={`${id}-label`} id={id} value={value} onChange={onChange} fullWidth>
+          {isLoading ? (
+            <MenuItem disabled>
+              <CircularProgress size={20} />
+            </MenuItem>
+          ) : (
+            options.map(({ _id, name, email }) => (
+              <MenuItem value={_id} key={_id}>
+                {name || email}
+              </MenuItem>
+            ))
+          )}
+        </Select>
+      </FormControl>
+    </Stack>
+  </Grid>
+);
+
+const Confirm = ({ actionType, setActionType, tableData }) => {
   const [kixieTemplate, setKixieTemplate] = useState('');
   const [emailTemplate, setEmailTemplate] = useState('');
   const [mailId, setMailId] = useState('');
   const [kixieNo, setKixieNo] = useState('');
+  const [names, setNames] = useState({
+    kixieTN: [],
+    kixieCN: [],
+    gmailTN: [],
+    gmailCN: []
+  });
+  const [loading, setLoading] = useState(false);
 
-  const handleSend = () => {
-    // Handle the sending logic here
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const updatedNames = { ...names };
+      if ([BOTH, SMS].includes(actionType)) {
+        updatedNames.kixieCN = await getKixieCredNames();
+        updatedNames.kixieTN = await getKixieTemplatesNames();
+      }
+
+      if ([BOTH, EMAIL].includes(actionType)) {
+        updatedNames.gmailCN = await getGmailCredNames();
+        updatedNames.gmailTN = await getGmailTemplatesNames();
+      }
+
+      setNames(updatedNames);
+    } catch (error) {
+      // Handle errors here
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCancel = () => {
-    // Handle the cancel logic here
+  useEffect(() => {
+    fetchData();
+  }, [actionType]);
 
+  const handleCancel = () => {
     setKixieTemplate('');
-    setEmailTemplate;
-    ('');
+    setEmailTemplate('');
     setMailId('');
     setKixieNo('');
     setActionType(false);
+  };
+
+  const handleSend = async () => {
+    const sendData = {};
+
+    if (actionType === SMS || actionType === BOTH) {
+      sendData.kixieCredId = kixieNo;
+      sendData.kixieTemplateId = kixieTemplate;
+    }
+
+    if (actionType === EMAIL || actionType === BOTH) {
+      sendData.emailCredId = mailId;
+      sendData.emailTemplateId = emailTemplate;
+    }
+    console.log({ sendData, tableData, actionType });
+
+    // Clear the selected values if needed
+    // setKixieTemplate('');
+    // setEmailTemplate('');
+    // setMailId('');
+    // setKixieNo('');
   };
 
   return (
@@ -49,73 +125,46 @@ const Confirm = ({ actionType, setActionType }) => {
           paddingBottom: '24px'
         }}
       >
-        {actionType === 'sms' || actionType === 'both' ? (
+        {actionType === SMS || actionType === BOTH ? (
           <>
-            <Grid item xs={12}>
-              <Stack spacing={1}>
-                <InputLabel htmlFor="kixie-template">Kixie Template</InputLabel>
-                <FormControl variant="outlined" fullWidth>
-                  <Select
-                    labelId="kixie-template-label"
-                    id="kixie-template"
-                    value={kixieTemplate}
-                    onChange={(e) => setKixieTemplate(e.target.value)}
-                    fullWidth
-                  >
-                    <MenuItem value="template1">Template 1</MenuItem>
-                    <MenuItem value="template2">Template 2</MenuItem>
-                  </Select>
-                </FormControl>
-              </Stack>
-            </Grid>
-            <Grid item xs={12}>
-              <Stack spacing={1}>
-                <InputLabel htmlFor="kixie-no">Kixie No</InputLabel>
-                <FormControl variant="outlined" fullWidth>
-                  <Select labelId="kixie-no-label" id="kixie-no" value={kixieNo} onChange={(e) => setKixieNo(e.target.value)} fullWidth>
-                    <MenuItem value="no1">Alex Kennedy</MenuItem>
-                    <MenuItem value="no2">Cameron Riley</MenuItem>
-                  </Select>
-                </FormControl>
-              </Stack>
-            </Grid>
+            <Dropdown
+              label="Kixie Template"
+              id="kixie-template"
+              value={kixieTemplate}
+              onChange={(e) => setKixieTemplate(e.target.value)}
+              options={names.kixieTN}
+              isLoading={loading}
+            />
+            <Dropdown
+              label="Kixie No"
+              id="kixie-no"
+              value={kixieNo}
+              onChange={(e) => setKixieNo(e.target.value)}
+              options={names.kixieCN}
+              isLoading={loading}
+            />
           </>
         ) : null}
-
-        {actionType === 'email' || actionType === 'both' ? (
+        {actionType === EMAIL || actionType === BOTH ? (
           <>
-            <Grid item xs={12}>
-              <Stack spacing={1}>
-                <InputLabel htmlFor="email-template">Email Template</InputLabel>
-                <FormControl variant="outlined" fullWidth>
-                  <Select
-                    labelId="email-template-label"
-                    id="email-template"
-                    value={emailTemplate}
-                    onChange={(e) => setEmailTemplate(e.target.value)}
-                    fullWidth
-                  >
-                    <MenuItem value="emailTemplate1">Payment Due</MenuItem>
-                    <MenuItem value="emailTemplate2">Ko - HTML[Interview]</MenuItem>
-                  </Select>
-                </FormControl>
-              </Stack>
-            </Grid>
-            <Grid item xs={12}>
-              <Stack spacing={1}>
-                <InputLabel htmlFor="mail-id">Mail ID</InputLabel>
-                <FormControl variant="outlined" fullWidth>
-                  <Select labelId="mail-id-label" id="mail-id" value={mailId} onChange={(e) => setMailId(e.target.value)} fullWidth>
-                    <MenuItem value="support@techis.io">support@techis.io</MenuItem>
-                    <MenuItem value="manikanta@techis.io">manikanta@techis.io</MenuItem>
-                    <MenuItem value="project1@techis.io">project1@techis.io</MenuItem>
-                  </Select>
-                </FormControl>
-              </Stack>
-            </Grid>
+            <Dropdown
+              label="Email Template"
+              id="email-template"
+              value={emailTemplate}
+              onChange={(e) => setEmailTemplate(e.target.value)}
+              options={names.gmailTN}
+              isLoading={loading}
+            />
+            <Dropdown
+              label="Mail Id"
+              id="mail-id"
+              value={mailId}
+              onChange={(e) => setMailId(e.target.value)}
+              options={names.gmailCN}
+              isLoading={loading}
+            />
           </>
         ) : null}
-
         <Grid item xs={12}>
           <Button variant="contained" color="primary" onClick={handleSend} fullWidth>
             Send

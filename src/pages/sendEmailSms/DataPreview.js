@@ -126,7 +126,6 @@ const handleParse = () => {
   };
 
   return (
-    
     <Container>
       <TextareaAutosize
         placeholder="Paste your Excel data here"
@@ -158,7 +157,6 @@ const handleParse = () => {
         Add Row
       </Button>
 
-      
       {/* buttons for sending SMS, Email, and both */}
       <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
         <Button variant="contained" onClick={() => setActionType('sms')} style={{ backgroundColor: '#4CAF50', color: 'white' }}>
@@ -171,7 +169,7 @@ const handleParse = () => {
           Send SMS & Email
         </Button>
       </div>
-      {actionType && <Confirm actionType={actionType} setActionType={setActionType} />}
+      {actionType && <Confirm actionType={actionType} setActionType={setActionType} tableData={tableData} />}
     </Container>
   );
 };

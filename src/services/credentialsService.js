@@ -15,6 +15,15 @@ export const addKixieCred = async (formData) => {
 };
 
 
+export const getKixieCredNames = async()=>{
+  return await handleRequest('get', '/api/kixie-credentials/names');
+}
+export const getGmailCredNames = async()=>{
+   return await handleRequest('get', '/api/gmail-credentials/emails');
+}
+
+
+
 
 const credentialService = { getKixieCredentials, getGmailCredentials };
 

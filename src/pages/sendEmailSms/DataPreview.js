@@ -2,6 +2,7 @@ import React, { useState, useEffect, useReducer, useCallback, memo } from 'react
 import Papa from 'papaparse';
 import { Button, Table, TableBody, TableCell, TableHead, TableRow, Paper, TextareaAutosize, Container, TextField } from '@mui/material';
 import Confirm from './confirm';
+import PreviewData from './summaryTable';
 
 const tableReducer = (state, action) => {
   switch (action.type) {
@@ -57,69 +58,69 @@ const DataPreview = () => {
   const [pasteData, setPasteData] = useState('');
   const [actionType, setActionType] = useState(false);
 
-const handleParse = () => {
-  Papa.parse(pasteData, {
-    delimiter: '\t',
-    header: true,
-    dynamicTyping: true,
-    complete: function (results) {
-      const validatedData = results.data.map((row, index) => {
-        let newRow = { ...row };
+  const handleParse = () => {
+    Papa.parse(pasteData, {
+      delimiter: '\t',
+      header: true,
+      dynamicTyping: true,
+      complete: function (results) {
+        const validatedData = results.data.map((row, index) => {
+          let newRow = { ...row };
 
-        // Validate phone
-        const phoneRegex = /^(\+?1)?[-.\s]?(\d{3})[-.\s]?(\d{3})[-.\s]?(\d{4})$/;
-        if (row.Phone && !phoneRegex.test(row.Phone)) {
-          console.warn(`Row ${index + 1}: Invalid US phone number - ${row.Phone}`);
-          newRow.Phone = ""
-        }
+          // Validate phone
+          const phoneRegex = /^(\+?1)?[-.\s]?(\d{3})[-.\s]?(\d{3})[-.\s]?(\d{4})$/;
+          if (row.Phone && !phoneRegex.test(row.Phone)) {
+            console.warn(`Row ${index + 1}: Invalid US phone number - ${row.Phone}`);
+            newRow.Phone = '';
+          }
 
-        // Validate email
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (row.Email && !emailRegex.test(row.Email)) {
-          console.warn(`Row ${index + 1}: Invalid email address - ${row.Email}`);
-          newRow.Email = ""
-        }
+          // Validate email
+          const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+          if (row.Email && !emailRegex.test(row.Email)) {
+            console.warn(`Row ${index + 1}: Invalid email address - ${row.Email}`);
+            newRow.Email = '';
+          }
 
-        return newRow;
-      });
+          return newRow;
+        });
 
-      dispatch({ type: 'SET_TABLE_DATA', data: validatedData });
+        dispatch({ type: 'SET_TABLE_DATA', data: validatedData });
+      }
+    });
+
+    setPasteData('');
+  };
+
+  const handleCellChange = useCallback((e, rowIndex, column) => {
+    let value = e.target.value;
+
+    if (column === 'Phone') {
+      // Basic US phone number validation: (123) 456-7890 or 123-456-7890
+      const phoneRegex = /^(\+?1)?[-.\s]?(\d{3})[-.\s]?(\d{3})[-.\s]?(\d{4})$/;
+      if (!phoneRegex.test(value)) {
+        alert('Invalid US phone number');
+        return;
+      }
     }
-  });
 
-  setPasteData('');
-};
+    if (column === 'Email') {
+      // Basic email validation
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(value)) {
+        alert('Invalid email address');
+        return;
+      }
+    }
 
+    dispatch({
+      type: 'UPDATE_CELL',
+      rowIndex,
+      column,
+      value: value
+    });
+  }, []);
 
- const handleCellChange = useCallback((e, rowIndex, column) => {
-   let value = e.target.value;
-
-   if (column === 'Phone') {
-     // Basic US phone number validation: (123) 456-7890 or 123-456-7890
-     const phoneRegex = /^(\+?1)?[-.\s]?(\d{3})[-.\s]?(\d{3})[-.\s]?(\d{4})$/;
-     if (!phoneRegex.test(value)) {
-       alert('Invalid US phone number');
-       return;
-     }
-   }
-
-   if (column === 'Email') {
-     // Basic email validation
-     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-     if (!emailRegex.test(value)) {
-       alert('Invalid email address');
-       return;
-     }
-   }
-
-   dispatch({
-     type: 'UPDATE_CELL',
-     rowIndex,
-     column,
-     value: value
-   });
- }, []);
-
+  const [resData, setResData] = useState({});
 
   const addRow = () => {
     dispatch({ type: 'ADD_ROW' });
@@ -169,7 +170,8 @@ const handleParse = () => {
           Send SMS & Email
         </Button>
       </div>
-      {actionType && <Confirm actionType={actionType} setActionType={setActionType} tableData={tableData} />}
+      {actionType && <Confirm actionType={actionType} setActionType={setActionType} tableData={tableData} setResData={setResData} />}
+      {resData && resData.length > 0 && <PreviewData resData={resData} setResData={setResData} />}
     </Container>
   );
 };

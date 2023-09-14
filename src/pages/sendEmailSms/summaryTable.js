@@ -1,0 +1,65 @@
+import React from 'react';
+import { Table, TableBody, TableCell, TableHead, TableRow, Paper, Container, Grid, Button } from '@mui/material';
+
+const SummaryTable = ({ summary, type }) => (
+  <Table >
+    <TableHead>
+      <TableRow>
+        <TableCell>Status</TableCell>
+        <TableCell>Name</TableCell>
+        <TableCell>{type === 'sms' ? 'Phone' : 'Email'}</TableCell>
+        <TableCell>Additional Info</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {summary.map((item, index) => (
+        <TableRow key={index}>
+          <TableCell>{item.status}</TableCell>
+          <TableCell>{item.value.Name || 'N/A'}</TableCell>
+          <TableCell>{item.value.Phone || item.value.Email || 'N/A'}</TableCell>
+          <TableCell>{item.value.reason || 'N/A'}</TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+);
+
+const PreviewData = ({ resData, setResData }) => (
+  <Container
+    style={{
+      width: '80%',
+      position: 'fixed',
+      height: '90vh',
+      top: '65px',
+      right: '0',
+      background: '#09090957',
+      overflow: 'scroll',
+      padding:" 0 26px"
+    }}
+  >
+    {resData?.smsSummary && (
+      <Paper elevation={3} style={{ height: resData?.emailSummary ? '40vh' : '80vh', overflow: 'scroll' }}>
+        <h2>SMS Summary</h2>
+        <SummaryTable summary={resData.smsSummary} type="sms" />
+      </Paper>
+    )}
+
+    {resData?.emailSummary && (
+      <Paper elevation={3} style={{ marginTop: '20px', height: resData?.smsSummary ? '40vh' : '80vh', overflow: 'scroll' }}>
+        <h2>Email Summary</h2>
+        <SummaryTable summary={resData.emailSummary} type="email" />
+      </Paper>
+    )}
+
+    <Grid item xs={12}>
+          
+          <Button variant="contained" color="secondary" onClick={()=>setResData(null)} fullWidth style={{ marginTop: '10px' }}>
+            Cancel
+          </Button>
+        </Grid>
+      
+
+  </Container>
+);
+
+export default PreviewData;

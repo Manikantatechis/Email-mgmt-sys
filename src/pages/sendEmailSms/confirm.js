@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Grid, InputLabel, FormControl, Button, Stack, Select, MenuItem, Container, CircularProgress } from '@mui/material';
 import { getGmailTemplatesNames, getKixieTemplatesNames } from 'services/templateService';
 import { getGmailCredNames, getKixieCredNames } from 'services/credentialsService';
+import { sendMessage } from 'services/messageService';
 
 const SMS = 'sms';
 const EMAIL = 'email';
@@ -31,7 +32,7 @@ const Dropdown = ({ label, id, value, onChange, options, isLoading }) => (
   </Grid>
 );
 
-const Confirm = ({ actionType, setActionType, tableData }) => {
+const Confirm = ({ actionType, setActionType, tableData, setResData }) => {
   const [kixieTemplate, setKixieTemplate] = useState('');
   const [emailTemplate, setEmailTemplate] = useState('');
   const [mailId, setMailId] = useState('');
@@ -42,6 +43,7 @@ const Confirm = ({ actionType, setActionType, tableData }) => {
     gmailTN: [],
     gmailCN: []
   });
+
   const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
@@ -79,24 +81,33 @@ const Confirm = ({ actionType, setActionType, tableData }) => {
   };
 
   const handleSend = async () => {
-    const sendData = {};
+    const actionData = {};
 
     if (actionType === SMS || actionType === BOTH) {
-      sendData.kixieCredId = kixieNo;
-      sendData.kixieTemplateId = kixieTemplate;
+      actionData.kixieCredId = kixieNo;
+      actionData.kixieTemplateId = kixieTemplate;
     }
 
     if (actionType === EMAIL || actionType === BOTH) {
-      sendData.emailCredId = mailId;
-      sendData.emailTemplateId = emailTemplate;
+      actionData.emailCredId = mailId;
+      actionData.emailTemplateId = emailTemplate;
     }
-    console.log({ sendData, tableData, actionType });
+    console.log({ actionData, tableData, actionType });
+    try {
+      const res = await sendMessage({ actionData, tableData, actionType });
+      setResData(res)
+      console.log(res)
+      alert(res)
+    } catch (error) {
+      console.log(error)
+    }
 
     // Clear the selected values if needed
-    // setKixieTemplate('');
-    // setEmailTemplate('');
-    // setMailId('');
-    // setKixieNo('');
+    setKixieTemplate('');
+    setEmailTemplate('');
+    setMailId('');
+    setKixieNo('');
+    setActionType(false);
   };
 
   return (

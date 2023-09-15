@@ -1,85 +1,73 @@
 const KixieCredentials = require("../models/kixieCredModel");
-const asyncHandler = require("express-async-handler")
+const asyncHandler = require("express-async-handler");
 
-// Function to add new KixieCredentials
+// Helper function to validate Kixie Credentials
+const validateKixieCredentials = ({ name, phone, kixieUserId, apiKey, businessId }) => {
+  return name && phone && kixieUserId && apiKey && businessId;
+};
+
+// Helper function to find Kixie Credentials
+const findKixieCredentials = async (userId, type) => {
+  return await KixieCredentials.find({
+    $or: [
+      { userId, type: 'personal' },
+      { type: 'global' }
+    ]
+  }).lean();
+};
+
+// Add new Kixie Credentials
 exports.addKixieCredentials = asyncHandler(async (req, res) => {
-	const { role, userId } = req; // Assuming role and userId are added to req.user after JWT authentication
+  const { role, userId } = req;
 
-	if (role !== "manager" && role !== "director") {
-		return res.status(403).json({ message: "You don't have permission to perform this action" });
-	}
+  if (role !== "manager" && role !== "director") {
+    throw new Error("You don't have permission to perform this action");
+  }
 
-	const { name, phone, kixieUserId, apiKey, status, businessId } = req.body;
+  if (!validateKixieCredentials(req.body)) {
+    throw new Error("Please enter all the necessary fields");
+  }
 
-	if (!name || !phone || !kixieUserId || !apiKey || !businessId) {
-		res.status(400);
-		throw new Error("pease enter all the necessary fields");
-	}
-	try {
-		const newCredentials = new KixieCredentials({
-			name,
-			phone,
-			kixieUserId,
-			apiKey,
-			status,
-			businessId,
-			userId,
-		});
+  const newCredentials = new KixieCredentials({
+    ...req.body,
+    userId
+  });
 
-		await newCredentials.save();
-
-		res.status(201).json({ message: "Successfully added" });
-	} catch (error) {
-		res.status(500)
-		throw new Error({ message: "Internal Server Error", error });
-	}
+  await newCredentials.save();
+  res.status(201).json({ message: "Successfully added" });
 });
 
-// Function to edit KixieCredentials (only status can be changed)
+// Edit Kixie Credentials
 exports.editKixieCredentials = asyncHandler(async (req, res) => {
-	const { role } = req;
+  const { role, userId } = req;
 
-	if (role !== "manager" && role !== "director") {
-		return res.status(403).json({ message: "You don't have permission to perform this action" });
-	}
+  if (role !== "manager" && role !== "director") {
+    throw new Error("You don't have permission to perform this action");
+  }
 
-	try {
-		const updatedCredentials = await KixieCredentials.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
-		if (!updatedCredentials) {
-			return res.status(404).json({ message: "KixieCredentials not found" });
-		}
+  const updatedCredentials = await KixieCredentials.findByIdAndUpdate(
+    req.params.id,
+    { status: req.body.status },
+    { new: true }
+  );
 
-		res.status(200).json({ message: "Successfully updated" });
-	} catch (error) {
-		res.status(500)
-		throw new Error(error.message);
-	}
+  if (!updatedCredentials) {
+    throw new Error("KixieCredentials not found");
+  }
+
+  res.status(200).json({ message: "Successfully updated" });
 });
 
-// Function to list KixieCredentials
+// List Kixie Credentials
 exports.listKixieCredentials = asyncHandler(async (req, res) => {
-	const { role } = req;
-
-	if (role !== "manager" && role !== "director") {
-		return res.status(403).json({ message: "You don't have permission to perform this action" });
-	}
-
-	try {
-		const credentials = await KixieCredentials.find({}).select("_id name phone").lean();
-
-		res.status(200).json(credentials);
-	} catch (error) {
-		res.status(500)
-		throw new Error(error.message);
-	}
+  const { userId } = req;
+  const credentials = await findKixieCredentials(userId, 'personal');
+  res.status(200).json(credentials);
 });
 
+// List Kixie Names
 exports.listKixieNames = asyncHandler(async (req, res) => {
-	try {
-		const credentials = await KixieCredentials.find({}).select("_id name").lean();
-		res.status(200).json(credentials);
-	} catch (error) {
-		res.status(500)
-		throw new Error(error.message);
-	}
+  const { userId } = req;
+  const credentials = await findKixieCredentials(userId, 'personal');
+  res.status(200).json(credentials.map(cred => ({ _id: cred._id, name: cred.name })));
 });

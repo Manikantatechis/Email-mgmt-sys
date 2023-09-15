@@ -1,86 +1,102 @@
 const GmailCredentials = require("../models/gmailCredModel");
-const asyncHandler = require("express-async-handler")
+const asyncHandler = require("express-async-handler");
 
+// Helper function to validate Gmail Credentials
+const validateGmailCredentials = (credentials) => {
+  const { email, oauthClientId, oauthClientSecret, oauthRefreshToken } = credentials;
+  return email && oauthClientId && oauthClientSecret && oauthRefreshToken;
+};
+
+// Helper function to find Gmail Credentials
+const findGmailCredentials = async (userId, type) => {
+  return await GmailCredentials.find({
+    $or: [
+      { userId, type: "personal" },
+      { type: "global" }
+    ]
+  });
+};
+
+// Add Gmail Credentials
 const addGmailCredentials = asyncHandler(async (req, res) => {
-	const { role, userId } = req;
+  const { role, userId } = req;
+  const credentials = req.body;
 
-	if (role !== "manager" && role !== "director") {
-		res.status(403)
-		throw new Error({ message: "You don't have permission to perform this action" });
-	}
-	const { email, oauthClientId, oauthClientSecret, oauthRefreshToken } = req.body;
-	if (!email || !oauthClientId || !oauthClientSecret || !oauthRefreshToken) {
-		res.status(400);
-		throw new Error("please enter all the credentials");
-	}
-	try {
-		const newCredentials = new GmailCredentials({
-			email,
-			oauthClientId,
-			oauthClientSecret,
-			oauthRefreshToken,
-			userId,
-		});
+  if (!validateGmailCredentials(credentials)) {
+    res.status(400);
+    throw new Error("Please enter all the credentials");
+  }
 
-		await newCredentials.save();
+  let { type } = req.body;
+  if (role !== "manager" && role !== "director") {
+    type = "personal";
+  }
 
-		res.status(201).json({ message: "Successfully added" });
-	} catch (error) {
-		res.status(500)
-		throw new Error(error.message);
-	}
+  try {
+    const newCredentials = new GmailCredentials({ ...credentials, userId, type });
+    await newCredentials.save();
+    res.status(201).json({ message: "Successfully added" });
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
 });
 
-const editGmailCredentials = asyncHandler(async (req, res) => {
-	const { role } = req;
-
-	if (role !== "manager" && role !== "director") {
-		return res.status(403)
-		throw new Error({ message: "You don't have permission to perform this action" });
-	}
-
-	const { status } = req.body;
-
-	try {
-		const updatedCredentials = await GmailCredentials.findByIdAndUpdate(req.params.id, status, { new: true });
-
-		if (!updatedCredentials) {
-			return res.status(404).json({ message: "GmailCredentials not found" });
-		}
-
-		res.status(200).json({ message: "Successfully updated" });
-	} catch (error) {
-		res.status(500)
-		throw new Error(error.message);
-	}
-});
-
+// List Gmail Credentials
 const listGmailCredentials = asyncHandler(async (req, res) => {
-	const { role } = req;
+  const { userId } = req;
 
-	if (role !== "manager" && role !== "director") {
-		res.status(403)
-		throw new Error({ message: "You don't have permission to perform this action" });
-	}
-
-	try {
-		const credentials = await GmailCredentials.find({}).select("_id email status").lean();
-		res.status(200).json(credentials);
-	} catch (error) {
-		res.status(500)
-		throw new Error(error.message);
-	}
+  try {
+    const credentials = await findGmailCredentials(userId, "personal");
+    res.status(200).json(credentials);
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
 });
 
+// List Gmail Emails
 const listGmailEmails = asyncHandler(async (req, res) => {
-	try {
-		const credentials = await GmailCredentials.find({}).select("_id email").lean();
+  const { userId } = req;
 
-		res.status(200).json(credentials);
-	} catch (error) {
-		res.status(500)
-		throw new Error(error.message);
-	}
+  try {
+    const credentials = await findGmailCredentials(userId, "personal");
+    res.status(200).json(credentials.map(({ _id, email }) => ({ _id, email })));
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
 });
 
-module.exports = { listGmailEmails, listGmailCredentials, editGmailCredentials, addGmailCredentials };
+// Edit Gmail Credentials
+const editGmailCredentials = asyncHandler(async (req, res) => {
+  const { role } = req;
+
+  if (role !== "manager" && role !== "director") {
+    res.status(403);
+    throw new Error("You don't have permission to perform this action");
+  }
+
+  const { status } = req.body;
+
+  try {
+    const updatedCredentials = await GmailCredentials.findByIdAndUpdate(req.params.id, { status }, { new: true });
+
+    if (!updatedCredentials) {
+      res.status(404);
+      throw new Error("GmailCredentials not found");
+    }
+
+    res.status(200).json({ message: "Successfully updated" });
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
+module.exports = {
+  listGmailEmails,
+  listGmailCredentials,
+  editGmailCredentials,
+  addGmailCredentials
+};

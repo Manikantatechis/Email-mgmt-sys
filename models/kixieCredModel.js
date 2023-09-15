@@ -12,6 +12,11 @@ const KixieCredentialsSchema = new mongoose.Schema({
 		ref: "User",
 		required: [true, "User ID (foreign key) is required"],
 	},
+	type:{
+		type: String,
+		enum: ["global", "personal"],
+		default: "personal",
+	},
 	kixieUserId: {
 		type: String,
 		required: [true, "User ID (string) is required"],

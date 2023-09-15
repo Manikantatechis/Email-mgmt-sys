@@ -18,6 +18,11 @@ const GmailCredentialsSchema = new mongoose.Schema({
 		enum: ["active", "inactive"],
 		default: "active",
 	},
+	type:{
+		type:String,
+		enum:["global", "personal"],
+		default:"personal"
+	},
 	email: {
 		type: String,
 		required: [true, "Email is required"],

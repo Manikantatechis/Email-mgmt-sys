@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import { TableCell, TableRow, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import truncateWithEllipsis from 'utils/truncate';
 
-const GmailTemplateRow = ({ name, html, content, status, type }) => {
+const GmailTemplateRow = ({ subject, html, content, status, type }) => {
   const [editMode, setEditMode] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
   return (
     <TableRow>
-      <TableCell>{name}</TableCell>
+      <TableCell>{subject}</TableCell>
       <TableCell>{type}</TableCell>
       <TableCell>
         {type === 'text' && truncateWithEllipsis(content, 150)}

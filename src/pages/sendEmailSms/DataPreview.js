@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useReducer, useCallback, memo } from 'react';
 import Papa from 'papaparse';
-import { Button, Table, TableBody, TableCell, TableHead, TableRow, Paper, TextareaAutosize, Container, TextField } from '@mui/material';
+import { Button, Table, TableBody, TableCell, TableHead, TableRow, Paper, TextareaAutosize, Container, TextField, Grid } from '@mui/material';
 import Confirm from './confirm';
 import PreviewData from './summaryTable';
+
 
 const tableReducer = (state, action) => {
   switch (action.type) {
@@ -14,6 +15,9 @@ const tableReducer = (state, action) => {
       return newState;
     case 'ADD_ROW':
       return [...state, { 'SL No': '', Name: '', Phone: '', Email: '' }];
+
+      case 'CLEAR_DATA':
+        return []
     default:
       return state;
   }
@@ -57,6 +61,17 @@ const DataPreview = () => {
   const [tableData, dispatch] = useReducer(tableReducer, []);
   const [pasteData, setPasteData] = useState('');
   const [actionType, setActionType] = useState(false);
+  const [resData, setResData] = useState(null);
+
+
+  const handleClick = (type)=>{
+    if(tableData.length > 0){
+      setActionType(type)
+    }else{
+      alert("Failed to send : No table data available.")
+    }
+  }
+
 
   const handleParse = () => {
     Papa.parse(pasteData, {
@@ -90,7 +105,9 @@ const DataPreview = () => {
 
     setPasteData('');
   };
-
+const handleClear = ()=>{
+  dispatch({ type: 'CLEAR_DATA'});
+}
   const handleCellChange = useCallback((e, rowIndex, column) => {
     let value = e.target.value;
 
@@ -120,7 +137,6 @@ const DataPreview = () => {
     });
   }, []);
 
-  const [resData, setResData] = useState({});
 
   const addRow = () => {
     dispatch({ type: 'ADD_ROW' });
@@ -154,24 +170,32 @@ const DataPreview = () => {
           </TableBody>
         </Table>
       </Paper>
-      <Button variant="contained" color="primary" onClick={addRow} style={{ margin: '10px' }}>
+      <Grid>
+        <Button variant="contained" color="primary" onClick={addRow} style={{ margin: '10px' }}>
         Add Row
       </Button>
+      <Button variant="contained" style={{ backgroundColor: 'rgb(243 69 69)', color: 'white', margin: '10px' }} onClick={handleClear}>
+        Clear 
+      </Button>
+      </Grid>
+      
 
       {/* buttons for sending SMS, Email, and both */}
-      <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
-        <Button variant="contained" onClick={() => setActionType('sms')} style={{ backgroundColor: '#4CAF50', color: 'white' }}>
+      <Grid style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+        <Button variant="contained" onClick={() => handleClick('sms')} style={{ backgroundColor: '#4CAF50', color: 'white' }}>
           Send SMS
         </Button>
-        <Button variant="contained" onClick={() => setActionType('email')} style={{ backgroundColor: '#2196F3', color: 'white' }}>
+        <Button variant="contained" onClick={() => handleClick('email')} style={{ backgroundColor: '#2196F3', color: 'white' }}>
           Send Email
         </Button>
-        <Button variant="contained" onClick={() => setActionType('both')} style={{ backgroundColor: '#FFC107', color: 'black' }}>
+        <Button variant="contained" onClick={() => handleClick('both')} style={{ backgroundColor: '#FFC107', color: 'black' }}>
           Send SMS & Email
         </Button>
-      </div>
+      </Grid>
       {actionType && <Confirm actionType={actionType} setActionType={setActionType} tableData={tableData} setResData={setResData} />}
-      {resData && resData.length > 0 && <PreviewData resData={resData} setResData={setResData} />}
+      {console.log("after"
+      ,resData)}
+      {resData && <PreviewData resData={resData} setResData={setResData} />}
     </Container>
   );
 };

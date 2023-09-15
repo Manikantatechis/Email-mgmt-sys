@@ -37,15 +37,15 @@ const PreviewData = ({ resData, setResData }) => (
       padding:" 0 26px"
     }}
   >
-    {resData?.smsSummary && (
-      <Paper elevation={3} style={{ height: resData?.emailSummary ? '40vh' : '80vh', overflow: 'scroll' }}>
+    {resData?.smsSummary && resData?.smsSummary.length > 0 &&  (
+      <Paper elevation={3} style={{ height: resData?.emailSummary.length > 0 ? '40vh' : '80vh', overflow: 'scroll' }}>
         <h2>SMS Summary</h2>
         <SummaryTable summary={resData.smsSummary} type="sms" />
       </Paper>
     )}
 
-    {resData?.emailSummary && (
-      <Paper elevation={3} style={{ marginTop: '20px', height: resData?.smsSummary ? '40vh' : '80vh', overflow: 'scroll' }}>
+    {resData?.emailSummary && resData?.emailSummary.length > 0 && (
+      <Paper elevation={3} style={{ marginTop: '20px', height: resData?.smsSummary.length > 0 ? '40vh' : '80vh', overflow: 'scroll' }}>
         <h2>Email Summary</h2>
         <SummaryTable summary={resData.emailSummary} type="email" />
       </Paper>
@@ -54,7 +54,7 @@ const PreviewData = ({ resData, setResData }) => (
     <Grid item xs={12}>
           
           <Button variant="contained" color="secondary" onClick={()=>setResData(null)} fullWidth style={{ marginTop: '10px' }}>
-            Cancel
+            Close
           </Button>
         </Grid>
       

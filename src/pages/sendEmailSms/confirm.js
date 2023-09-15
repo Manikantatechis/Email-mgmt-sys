@@ -20,9 +20,9 @@ const Dropdown = ({ label, id, value, onChange, options, isLoading }) => (
               <CircularProgress size={20} />
             </MenuItem>
           ) : (
-            options.map(({ _id, name, email }) => (
+            options.map(({ _id,name, subject, email }) => (
               <MenuItem value={_id} key={_id}>
-                {name || email}
+                {name || subject || email}
               </MenuItem>
             ))
           )}
@@ -95,9 +95,9 @@ const Confirm = ({ actionType, setActionType, tableData, setResData }) => {
     console.log({ actionData, tableData, actionType });
     try {
       const res = await sendMessage({ actionData, tableData, actionType });
+
       setResData(res)
       console.log(res)
-      alert(res)
     } catch (error) {
       console.log(error)
     }

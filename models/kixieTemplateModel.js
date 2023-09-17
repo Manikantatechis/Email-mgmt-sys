@@ -22,11 +22,6 @@ const KixieTemplateSchema = new Schema(
       type: String,
       required: [true, "Content is required"],
     },
-    type: {
-      type: String,
-      enum: ["global", "personal"],
-      default: "personal",
-    },
     status: {
       type: String,
       enum: ["active", "inactive"],

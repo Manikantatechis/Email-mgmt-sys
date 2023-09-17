@@ -62,11 +62,10 @@ const dispatch = useDispatch()
           try {
             setStatus({ success: false });
             const response = await dispatch(loginUser({...values}));
-            if (response) {
-              console.log(response.type === 'auth/loginUser/fulfilled');
+            if (response.type === 'auth/loginUser/fulfilled') {
               setStatus({ success: true });
               setErrors({ submit: true });
-              navigate("/")
+              navigate('/');
             } else {
               setErrors({ submit: 'Invalid credentials' });
             }

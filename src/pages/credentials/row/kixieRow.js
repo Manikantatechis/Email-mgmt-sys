@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TableRow, TableCell, Button, Select, MenuItem } from '@mui/material';
 import { EditOutlined } from '@ant-design/icons';
 
-const KixieRow = ({ id, name, phone, status, index }) => {
+const KixieRow = ({ id, name, phone, status, index, role }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newStatus, setNewStatus] = useState(status);
 
@@ -18,29 +18,31 @@ const KixieRow = ({ id, name, phone, status, index }) => {
       <TableCell style={{ width: '20%' }}>
         {isEditing ? (
           <Select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
-            <MenuItem value="Active">Active</MenuItem>
-            <MenuItem value="Inactive">Inactive</MenuItem>
+            <MenuItem value="active">Active</MenuItem>
+            <MenuItem value="inactive">Inactive</MenuItem>
           </Select>
         ) : (
           status || 'Active'
         )}
       </TableCell>
-      <TableCell style={{ width: '20%' }}>
-        {isEditing ? (
-          <>
-            <Button variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={handleUpdate}>
-              Update
+      {(role === 'manager' || role === 'director' || type === 'personal') && (
+        <TableCell style={{ width: '20%' }}>
+          {isEditing ? (
+            <>
+              <Button variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={handleUpdate}>
+                Update
+              </Button>
+              <Button variant="contained" color="secondary" onClick={handleCancel}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button variant="contained" color="primary" startIcon={<EditOutlined />} onClick={handleEdit}>
+              Edit
             </Button>
-            <Button variant="contained" color="secondary" onClick={handleCancel}>
-              Cancel
-            </Button>
-          </>
-        ) : (
-          <Button variant="contained" color="primary" startIcon={<EditOutlined />} onClick={handleEdit}>
-            Edit
-          </Button>
-        )}
-      </TableCell>
+          )}
+        </TableCell>
+      )}
     </TableRow>
   );
 };

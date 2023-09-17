@@ -1,42 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box } from '@mui/material';
-import AddCredentials from './AddCredentials'; // Import the AddCredentials component
 import KixieRow from './row/kixieRow';
 import CredentialRow from './row/credentialRow';
 import { Grid } from '../../../node_modules/@mui/material/index';
 import { getGmailCredentials, getKixieCredentials } from 'store/credentials/credentialsThunk';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectGmailCredentialsList, selectIsGmailLoading, selectIsKixieLoading, selectKixieCredentialsList } from 'store/credentials/credentialsSlice';
+import {
+  selectGmailCredentialsList,
+  selectIsGmailLoading,
+  selectIsKixieLoading,
+  selectKixieCredentialsList
+} from 'store/credentials/credentialsSlice';
 import Loader from 'components/Loader';
+import AddGmailCredentials from './AddGmailCredentials';
+import AddKixieCredentials from './AddKixieCredentials';
 
 const CredentialManager = () => {
-  const [actionType, setActionType] = useState(null); // 'gmail' or 'kixie'
-  const gmailCredentials = useSelector(selectGmailCredentialsList)
-  // [
-  //   { id: 1, emailId: 'example@gmail.com', status: 'Active' },
-  //   { id: 1, emailId: 'example@gmail.com', status: 'Active' },
-  //   { id: 1, emailId: 'example@gmail.com', status: 'Active' },
-  //   { id: 1, emailId: 'example@gmail.com', status: 'Active' }
-  // ];
-const kixieCredentials =useSelector(selectKixieCredentialsList)
-  // const kixieCredentials = [
-  //   { id: 1, name: 'John Doe', phoneNo: '1234567890', status: 'Active' },
-  //   { id: 1, name: 'John Doe', phoneNo: '1234567890', status: 'Active' },
-  //   { id: 1, name: 'John Doe', phoneNo: '1234567890', status: 'Active' },
-  //   { id: 1, name: 'John Doe', phoneNo: '1234567890', status: 'Active' },
-  //   { id: 1, name: 'John Doe', phoneNo: '1234567890', status: 'Active' },
-  // ];
+  const [isKixieCredentialsOpen, setIsKixieCredentialsOpen] = useState(false);
+  const [isGmailCredentialsOpen, setIsGmailCredentialsOpen] = useState(false);
 
-const dispatch = useDispatch()
-const isKixieLoading = useSelector(selectIsKixieLoading);
-const isGmailLoading = useSelector(selectIsGmailLoading);
+  const gmailCredentials = useSelector(selectGmailCredentialsList);
+  const kixieCredentials = useSelector(selectKixieCredentialsList);
 
+  const dispatch = useDispatch();
+  const isKixieLoading = useSelector(selectIsKixieLoading);
+  const isGmailLoading = useSelector(selectIsGmailLoading);
 
+  const role = localStorage.getItem('userRole');
 
-  useEffect(()=>{
-    dispatch(getKixieCredentials())
-    dispatch(getGmailCredentials())
-  },[])
+  useEffect(() => {
+    dispatch(getKixieCredentials());
+    dispatch(getGmailCredentials());
+  }, []);
 
   return (
     <Container>
@@ -48,7 +43,7 @@ const isGmailLoading = useSelector(selectIsGmailLoading);
               variant="contained"
               color="primary"
               style={{ whiteSpace: 'nowrap', padding: '7px 30px' }}
-              onClick={() => setActionType('gmail')}
+              onClick={() => setIsGmailCredentialsOpen(true)}
             >
               Add Gmail Credentials
             </Button>
@@ -67,7 +62,7 @@ const isGmailLoading = useSelector(selectIsGmailLoading);
               </TableHead>
               <TableBody>
                 {gmailCredentials.map((cred, index) => (
-                  <CredentialRow key={cred.id} {...cred} index={index + 1} />
+                  <CredentialRow key={cred.id} {...cred} index={index + 1} role={role} />
                 ))}
               </TableBody>
             </Table>
@@ -82,7 +77,7 @@ const isGmailLoading = useSelector(selectIsGmailLoading);
               variant="contained"
               color="primary"
               style={{ whiteSpace: 'nowrap', padding: '7px 30px' }}
-              onClick={() => setActionType('kixie')}
+              onClick={() => setIsKixieCredentialsOpen(true)}
             >
               Add Kixie Credentials
             </Button>
@@ -101,13 +96,14 @@ const isGmailLoading = useSelector(selectIsGmailLoading);
               </TableHead>
               <TableBody>
                 {kixieCredentials.map((cred, index) => (
-                  <KixieRow key={cred.id} {...cred} index={index + 1} />
+                  <KixieRow key={cred.id} {...cred} index={index + 1} role={role} />
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
         </Grid>
-        {actionType && <AddCredentials actionType={actionType} setActionType={setActionType} />}
+        {isGmailCredentialsOpen && <AddGmailCredentials setIsGmailCredentialsOpen={setIsGmailCredentialsOpen} role={role} />}
+        {isKixieCredentialsOpen && <AddKixieCredentials setIsKixieCredentialsOpen={setIsKixieCredentialsOpen} role={role} />}
       </Paper>
     </Container>
   );

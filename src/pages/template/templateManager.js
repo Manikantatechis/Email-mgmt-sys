@@ -2,29 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { Button, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box } from '@mui/material';
 import GmailTemplateRow from './row/GmailTemplateRow';
 import KixieTemplateRow from './row/KixieTemplateRow';
-import AddTemplate from './AddTemplate';
 import { useDispatch, useSelector } from 'react-redux';
 import { getGmailTemplates, getKixieTemplates } from 'store/templates/templateThunk';
 import { selectGmailTemplates, selectIsGmailLoading, selectIsKixieLoading, selectKixieTemplates } from 'store/templates/templateSlice';
+import AddKixieTempate from './AddKixieTemplate';
+import AddGmailTemplate from './AddGmailTemplate';
 
 const TemplateManager = () => {
-  const [actionType, setActionType] = useState(null); // 'gmailTemplate' or 'kixieTemplate'
+  const [isKixieTemplateOpen, setIsKixieTemplateOpen] = useState(null); 
+  const [isGmailTemplateOpen, setIsGmailTemplateOpen] = useState(null); 
 
   const gmailTemplates = useSelector(selectGmailTemplates)
-  // [
-  //   { id: 1, name: 'Template 1', content: 'Hello, this is Gmail template 1', status: 'Active' }
-  //   // Add more Gmail templates here
-  // ];
-
+ 
   const kixieTemplates =  useSelector(selectKixieTemplates)
-  // [
-  //   { id: 1, name: 'Template 1', content: 'Hello, this is Kixie template 1', status: 'Active' }
-  //   // Add more Kixie templates here
-  // ];
+
   const isGmailLoading = useSelector(selectIsGmailLoading)
   const isKixieLoading = useSelector(selectIsKixieLoading);
 
 const dispatch = useDispatch()
+const role = localStorage.getItem("userRole")
 
   useEffect(()=>{
     dispatch(getGmailTemplates())
@@ -40,7 +36,7 @@ const dispatch = useDispatch()
             variant="contained"
             color="primary"
             style={{ whiteSpace: 'nowrap', padding: '7px 30px' }}
-            onClick={() => setActionType('gmail')}
+            onClick={() => setIsGmailTemplateOpen(true)}
           >
             Add Gmail Template {isGmailLoading} {isKixieLoading}
           </Button>
@@ -58,9 +54,9 @@ const dispatch = useDispatch()
               </TableRow>
             </TableHead>
             <TableBody>
-              {gmailTemplates && gmailTemplates.length > 0 && gmailTemplates.map((template) => (
-                <GmailTemplateRow key={template.id} {...template} actionType={actionType} />
-              ))}
+              {gmailTemplates &&
+                gmailTemplates.length > 0 &&
+                gmailTemplates.map((template) => <GmailTemplateRow key={template.id} {...template} role={role} />)}
             </TableBody>
           </Table>
         </TableContainer>
@@ -71,7 +67,7 @@ const dispatch = useDispatch()
             variant="contained"
             color="primary"
             style={{ whiteSpace: 'nowrap', padding: '7px 30px' }}
-            onClick={() => setActionType('kixie')}
+            onClick={() => setIsKixieTemplateOpen(true)}
           >
             Add Kixie Template
           </Button>
@@ -90,12 +86,13 @@ const dispatch = useDispatch()
             <TableBody>
               {kixieTemplates &&
                 kixieTemplates.length > 0 &&
-                kixieTemplates.map((template) => <KixieTemplateRow key={template.id} {...template} />)}
+                kixieTemplates.map((template) => <KixieTemplateRow key={template.id} {...template} role={role}/>)}
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
-      {actionType && <AddTemplate actionType={actionType} setActionType={setActionType} />}
+      {isKixieTemplateOpen && <AddKixieTempate setIsKixieTemplateOpen={setIsKixieTemplateOpen} role={role} />}
+      {isGmailTemplateOpen && <AddGmailTemplate setIsGmailTemplateOpen={setIsGmailTemplateOpen} role={role} />}
     </Container>
   );
 };

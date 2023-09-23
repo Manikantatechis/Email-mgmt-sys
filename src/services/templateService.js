@@ -13,6 +13,13 @@ const getGmailTemplates = async () => {
   return await handleRequest('get', '/api/gmail-template/list');
 };
 
+export const editGmailTemplate = async (formData, id) => {
+  return await handleRequest('put', `/api/gmail-template/edit/${id}`, { ...formData });
+};
+
+export const editKixieTemplate = async (formData, id)=>{
+  return await handleRequest('put', `/api/kixie-template/edit/${id}`, {...formData});
+}
 const getKixieTemplates = async () => {
   return await handleRequest('get', '/api/kixie-template/list');
 };

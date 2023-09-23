@@ -20,7 +20,7 @@ const Dropdown = ({ label, id, value, onChange, options, isLoading }) => (
               <CircularProgress size={20} />
             </MenuItem>
           ) : (
-            options.map(({ _id,name, subject, email }) => (
+            options&& options.length > 0 &&   options?.map(({ _id,name, subject, email }) => (
               <MenuItem value={_id} key={_id}>
                 {name || subject || email}
               </MenuItem>

@@ -3,18 +3,17 @@ import React, { useState } from 'react';
 import { TableCell, TableRow, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import truncateWithEllipsis from 'utils/truncate';
 
-const KixieTemplateRow = ({ id, name, content, status, template_type, role }) => {
-  const [editMode, setEditMode] = useState(false);
+const KixieTemplateRow = ({ _id, name, content, status, template_type, role, handleKixieTemplateEdit }) => {
   const [showPreview, setShowPreview] = useState(false);
 
   return (
-    <TableRow key={id}>
+    <TableRow key={_id}>
       <TableCell>{name}</TableCell>
       <TableCell>{truncateWithEllipsis(content, 150)}</TableCell>
       <TableCell>{status}</TableCell>
       <TableCell style={{ width: '25%' }}>
         {(role === 'director' || role === 'manager' || template_type === 'personal') && (
-          <Button onClick={() => setEditMode(!editMode)}>Edit</Button>
+          <Button onClick={() => handleKixieTemplateEdit(_id)}>Edit</Button>
         )}
 
         <Button onClick={() => setShowPreview(true)}>Preview</Button>

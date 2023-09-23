@@ -55,8 +55,9 @@ const CredentialManager = () => {
               <TableHead>
                 <TableRow>
                   <TableCell style={{ width: '10%' }}>Sl No</TableCell>
-                  <TableCell style={{ width: '40%' }}>Email ID</TableCell>
-                  <TableCell style={{ width: '40%' }}>Status</TableCell>
+                  <TableCell style={{ width: '30%' }}>Email ID</TableCell>
+                  <TableCell style={{ width: '30%' }}>Status</TableCell>
+                  <TableCell style={{ width: '30%' }}>Type</TableCell>
                   <TableCell style={{ width: '20%' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -88,9 +89,10 @@ const CredentialManager = () => {
               <TableHead>
                 <TableRow>
                   <TableCell style={{ width: '10%' }}>Sl No</TableCell>
-                  <TableCell style={{ width: '30%' }}>Name</TableCell>
+                  <TableCell style={{ width: '20%' }}>Name</TableCell>
                   <TableCell style={{ width: '30%' }}>Phone No</TableCell>
                   <TableCell style={{ width: '20%' }}>Status</TableCell>
+                  <TableCell style={{ width: '30%' }}>Type</TableCell>
                   <TableCell style={{ width: '20%' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>

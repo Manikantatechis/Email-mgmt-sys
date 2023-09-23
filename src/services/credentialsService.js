@@ -22,6 +22,14 @@ export const getGmailCredNames = async()=>{
    return await handleRequest('get', '/api/gmail-credentials/emails');
 }
 
+export const editGmailCred = async(formData, id)=>{
+  return await handleRequest('patch', `/api/gmail-credentials/edit/${id}`, {...formData})
+}
+
+export const editKixieCred = async(formData, id)=>{
+  return await handleRequest('patch', `/api/kixie-credentials/edit/${id}`, {...formData})
+}
+
 
 
 

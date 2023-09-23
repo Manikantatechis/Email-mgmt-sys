@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { TableCell, TableRow, Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid } from '@mui/material';
 import truncateWithEllipsis from 'utils/truncate';
 
-const GmailTemplateRow = ({ subject, html, content, status, template_type, cc, bcc, role, type }) => {
+const GmailTemplateRow = ({ _id, subject, html, content, status, template_type, cc, bcc, role, type, handleGmailTemplateEdit }) => {
   console.log({ role });
-  const [editMode, setEditMode] = useState(false);
+
   const [showPreview, setShowPreview] = useState(false);
 
   const dialogStyles = {
@@ -34,7 +34,7 @@ const GmailTemplateRow = ({ subject, html, content, status, template_type, cc, b
   };
 
   return (
-    <TableRow>
+    <TableRow key={_id}>
       <TableCell>{subject}</TableCell>
       <TableCell>{type}</TableCell>
       <TableCell>
@@ -44,7 +44,7 @@ const GmailTemplateRow = ({ subject, html, content, status, template_type, cc, b
       <TableCell>{status}</TableCell>
       <TableCell>
         {(role === 'manager' || role === 'director' || template_type === 'personal') && (
-          <Button onClick={() => setEditMode(!editMode)}>Edit</Button>
+          <Button onClick={() => handleGmailTemplateEdit(_id)}>Edit</Button>
         )}
 
         <Button onClick={() => setShowPreview(true)}>Preview</Button>

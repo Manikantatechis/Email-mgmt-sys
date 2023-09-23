@@ -9,23 +9,37 @@ import AddKixieTempate from './AddKixieTemplate';
 import AddGmailTemplate from './AddGmailTemplate';
 
 const TemplateManager = () => {
-  const [isKixieTemplateOpen, setIsKixieTemplateOpen] = useState(null); 
-  const [isGmailTemplateOpen, setIsGmailTemplateOpen] = useState(null); 
+  const [isKixieTemplateOpen, setIsKixieTemplateOpen] = useState(null);
+  const [isGmailTemplateOpen, setIsGmailTemplateOpen] = useState(null);
+  const [actionType, setActionType] = useState(null)
 
-  const gmailTemplates = useSelector(selectGmailTemplates)
- 
-  const kixieTemplates =  useSelector(selectKixieTemplates)
+  const handleGmailTemplateEdit = (id)=>{
+    setActionType({id, type:'edit'})
+    setIsGmailTemplateOpen(true)
 
-  const isGmailLoading = useSelector(selectIsGmailLoading)
+    
+  }
+  const handleKixieTemplateEdit = (id)=>{
+    setActionType({id, type:'edit'})
+    setIsKixieTemplateOpen(true)
+    
+  }
+
+  const gmailTemplates = useSelector(selectGmailTemplates);
+
+  const kixieTemplates = useSelector(selectKixieTemplates);
+
+  const isGmailLoading = useSelector(selectIsGmailLoading);
   const isKixieLoading = useSelector(selectIsKixieLoading);
 
-const dispatch = useDispatch()
-const role = localStorage.getItem("userRole")
 
-  useEffect(()=>{
-    dispatch(getGmailTemplates())
-    dispatch(getKixieTemplates())
-  },[])
+  const dispatch = useDispatch();
+  const role = localStorage.getItem('userRole');
+
+  useEffect(() => {
+    dispatch(getGmailTemplates());
+    dispatch(getKixieTemplates());
+  }, []);
 
   return (
     <Container>
@@ -56,7 +70,7 @@ const role = localStorage.getItem("userRole")
             <TableBody>
               {gmailTemplates &&
                 gmailTemplates.length > 0 &&
-                gmailTemplates.map((template) => <GmailTemplateRow key={template.id} {...template} role={role} />)}
+                gmailTemplates.map((template) => <GmailTemplateRow key={template.id} {...template} role={role} handleGmailTemplateEdit={handleGmailTemplateEdit} />)}
             </TableBody>
           </Table>
         </TableContainer>
@@ -86,13 +100,13 @@ const role = localStorage.getItem("userRole")
             <TableBody>
               {kixieTemplates &&
                 kixieTemplates.length > 0 &&
-                kixieTemplates.map((template) => <KixieTemplateRow key={template.id} {...template} role={role}/>)}
+                kixieTemplates.map((template) => <KixieTemplateRow key={template.id} {...template} role={role} handleKixieTemplateEdit={handleKixieTemplateEdit} />)}
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
-      {isKixieTemplateOpen && <AddKixieTempate setIsKixieTemplateOpen={setIsKixieTemplateOpen} role={role} />}
-      {isGmailTemplateOpen && <AddGmailTemplate setIsGmailTemplateOpen={setIsGmailTemplateOpen} role={role} />}
+      {isKixieTemplateOpen && <AddKixieTempate setIsKixieTemplateOpen={setIsKixieTemplateOpen} role={role} actionType={actionType} />}
+      {isGmailTemplateOpen && <AddGmailTemplate setIsGmailTemplateOpen={setIsGmailTemplateOpen} role={role} actionType={actionType} />}
     </Container>
   );
 };

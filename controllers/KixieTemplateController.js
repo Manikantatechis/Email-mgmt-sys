@@ -1,92 +1,104 @@
 const asyncHandler = require("express-async-handler");
 const KixieTemplate = require("../models/kixieTemplateModel");
 
-// Middleware to check if the user is manager or director
-const checkRole = (req, res, next) => {
-    const { role } = req;
-    if (role !== "manager" && role !== "director") {
-        return res
-            .status(403)
-            .json({
-                error: "Access denied. Only manager and director can perform this action.",
-            });
-    }
-    next();
-};
-
 // Helper function to find templates
 const findTemplates = async (userId, fields) => {
-    return await KixieTemplate.find({
-        $or: [
-            { userId, template_type: "personal" },
-            { template_type: "global" },
-        ],
-    }).select(fields);
+  return KixieTemplate.find({
+    $or: [{ userId, template_type: "personal" }, { template_type: "global" }],
+  }).select(fields);
 };
 
-exports.createTemplate = asyncHandler(async (req, res, next) => {
-    const { userId, role } = req;
+const assignTemplateType = (role, template_type) => {
+  if ((role !== "manager" && role !== "director") || !template_type) {
+    return "personal";
+  }
+  return template_type;
+};
 
-    const { name, content, status } = req.body;
-    let {template_type} = req.body
-    if (role !== "manager" || role !== "director" || !template_type) {
-        template_type = "personal";
-    }
+const createTemplate = asyncHandler(async (req, res) => {
+  const { userId, role, body } = req;
 
-	console.log(template_type)
+  body.template_type = assignTemplateType(role, body.template_type);
 
-    const template = new KixieTemplate({
-        name,
-        userId,
-        content,
-        status,
-        template_type,
-    });
-    const savedTemplate = await template.save();
-    res.status(201).json(savedTemplate);
+  const template = new KixieTemplate({
+    ...body,
+    userId,
+  });
+
+  const savedTemplate = await template.save();
+  res.status(201).json(savedTemplate);
 });
 
-exports.getAllTemplates = asyncHandler(async (req, res) => {
-    const { userId } = req;
-    const templates = await findTemplates(userId, "_id name content status");
-    res.status(200).json(templates);
+const getAllTemplates = asyncHandler(async (req, res) => {
+  const { userId } = req;
+  const templates = await findTemplates(userId, "_id name content status");
+  res.status(200).json(templates);
 });
 
-exports.getTemplateNames = asyncHandler(async (req, res) => {
-    const { userId } = req;
-    const templates = await findTemplates(userId, "_id name");
-
-    if (!templates.length) {
-        return res.status(404).json({ error: "Template not found" });
-    }
-    res.status(200).json(templates);
+const getTemplateById = asyncHandler(async (req, res) => {
+  const { userId } = req;
+  const { id } = req.params;
+  const template = await KixieTemplate.findById(id);
+  res.status(200).json(template);
 });
 
-exports.updateTemplate = asyncHandler(async (req, res) => {
-    checkRole(req, res);
+const getTemplateNames = asyncHandler(async (req, res) => {
+  const { userId } = req;
+  const templates = await KixieTemplate
+    .find({
+      $or: [
+        { userId, template_type: "personal", status: "active" },
+        { template_type: "global", status: "active" },
+      ],
+    })
+    .select("_id name");
 
-    const { name, content, status, type } = req.body;
-    const updatedTemplate = await KixieTemplate.findByIdAndUpdate(
-        req.params.templateId,
-        { name, content, status, type },
-        { new: true }
-    );
+  if (!templates.length) {
+    return res.status(404).json({ error: "Template not found" });
+  }
+  res.status(200).json(templates);
+});
 
-    if (!updatedTemplate) {
-        return res.status(404).json({ error: "Template not found" });
-    }
+const updateTemplate = asyncHandler(async (req, res) => {
+  const { role, params, body } = req;
+  const { id } = params;
+
+  body.template_type = assignTemplateType(role, body.template_type);
+
+  const updatedTemplate = await KixieTemplate.findByIdAndUpdate(
+    { _id: id },
+    body,
+    { new: true }
+  );
+
+  if (!updatedTemplate) {
+    res.status(404);
+    throw new Error("Template not found");
+  } else {
     res.status(200).json(updatedTemplate);
+  }
 });
 
-exports.deleteTemplate = asyncHandler(async (req, res) => {
-    checkRole(req, res);
+const deleteTemplate = asyncHandler(async (req, res) => {
+  const { role, params, body } = req;
 
-    const deletedTemplate = await KixieTemplate.findByIdAndDelete(
-        req.params.templateId
-    );
+  body.template_type = assignTemplateType(role, body.template_type);
 
-    if (!deletedTemplate) {
-        return res.status(404).json({ error: "Template not found" });
-    }
-    res.status(204).send();
+  const deletedTemplate = await KixieTemplate.findByIdAndDelete(
+    params.templateId
+  );
+
+  if (!deletedTemplate) {
+    return res.status(404).json({ error: "Template not found" });
+  }
+  res.status(204).send();
 });
+
+module.exports = {
+  createTemplate,
+  getAllTemplates,
+  getTemplateById,
+  getTemplateNames,
+  updateTemplate,
+  deleteTemplate,
+};

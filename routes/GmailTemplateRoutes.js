@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { addGmailTemplate, listGmailTemplates, editGmailTemplate, deleteGmailTemplate, getTemplateNames } = require("../controllers/GmailTemplateController");
+const { addGmailTemplate, listGmailTemplates, editGmailTemplate,listGmailTemplateById, deleteGmailTemplate, getTemplateNames } = require("../controllers/GmailTemplateController");
 const isAuthenticated = require("../middlewares/authMiddleware");
 
 router.use(isAuthenticated);
@@ -8,8 +8,14 @@ router.use(isAuthenticated);
 // Route to add an HTML template
 router.post("/add", addGmailTemplate);
 
+
+//Route to get Template By ID
+router.get("/list/:id", listGmailTemplateById);
+
+
 // Route to list all HTML templates
 router.get("/list", listGmailTemplates);
+
 
 // Route to list all HTML templates names
 router.get("/names", getTemplateNames);

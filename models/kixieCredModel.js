@@ -65,7 +65,6 @@ KixieCredentialsSchema.pre("save", function (next) {
 });
 
 KixieCredentialsSchema.post("find", function (docs) {
-	console.log("hello, model", docs)
 	docs.forEach((doc) => {
 		if (doc.apiKey) {
 			const iv = Buffer.from(doc.apiKey.slice(0, ivLength * 2), "hex");
@@ -73,7 +72,6 @@ KixieCredentialsSchema.post("find", function (docs) {
 			const decipher = crypto.createDecipheriv(algorithm, Buffer.from(encryptionKey), iv);
 			let decrypted = decipher.update(encryptedData, "hex", "utf8");
 			decrypted += decipher.final("utf8");
-			console.log(decrypted);
 			doc.apiKey = decrypted;
 		} 
 	});

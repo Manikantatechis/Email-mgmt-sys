@@ -2,17 +2,20 @@ const KixieCredentials = require("../models/kixieCredModel");
 const asyncHandler = require("express-async-handler");
 
 // Helper function to validate Kixie Credentials
-const validateKixieCredentials = ({ name, phone, kixieUserId, apiKey, businessId }) => {
+const validateKixieCredentials = ({
+  name,
+  phone,
+  kixieUserId,
+  apiKey,
+  businessId,
+}) => {
   return name && phone && kixieUserId && apiKey && businessId;
 };
 
 // Helper function to find Kixie Credentials
 const findKixieCredentials = async (userId, type) => {
   return await KixieCredentials.find({
-    $or: [
-      { userId, type: 'personal' },
-      { type: 'global' }
-    ]
+    $or: [{ userId, type: "personal" }, { type: "global" }],
   }).lean();
 };
 
@@ -30,7 +33,7 @@ exports.addKixieCredentials = asyncHandler(async (req, res) => {
 
   const newCredentials = new KixieCredentials({
     ...req.body,
-    userId
+    userId,
   });
 
   await newCredentials.save();
@@ -39,15 +42,16 @@ exports.addKixieCredentials = asyncHandler(async (req, res) => {
 
 // Edit Kixie Credentials
 exports.editKixieCredentials = asyncHandler(async (req, res) => {
-  const { role, userId } = req;
+  const { role } = req;
 
   if (role !== "manager" && role !== "director") {
-    throw new Error("You don't have permission to perform this action");
+    req.body.type = "personal";
   }
+  const { status, type } = req.body;
 
   const updatedCredentials = await KixieCredentials.findByIdAndUpdate(
     req.params.id,
-    { status: req.body.status },
+    { status, type },
     { new: true }
   );
 
@@ -61,13 +65,20 @@ exports.editKixieCredentials = asyncHandler(async (req, res) => {
 // List Kixie Credentials
 exports.listKixieCredentials = asyncHandler(async (req, res) => {
   const { userId } = req;
-  const credentials = await findKixieCredentials(userId, 'personal');
+  const credentials = await findKixieCredentials(userId, "personal");
   res.status(200).json(credentials);
 });
 
 // List Kixie Names
 exports.listKixieNames = asyncHandler(async (req, res) => {
   const { userId } = req;
-  const credentials = await findKixieCredentials(userId, 'personal');
-  res.status(200).json(credentials.map(cred => ({ _id: cred._id, name: cred.name })));
+  const credentials = await  KixieCredentials.find({
+    $or: [{ userId, type: "personal", status:'active' }, { type: "global",  status:'active' }],
+  }).select("_id name")
+
+
+
+  res
+    .status(200)
+    .json(credentials);
 });

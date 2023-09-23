@@ -10,7 +10,7 @@ const authMiddleware = require("../middlewares/authMiddleware"); // Your JWT aut
 router.post("/add", authMiddleware, KixieCredentialsController.addKixieCredentials);
 
 // Route to edit a KixieCredential
-router.put("/edit/:id", authMiddleware, KixieCredentialsController.editKixieCredentials);
+router.patch("/edit/:id", authMiddleware, KixieCredentialsController.editKixieCredentials);
 
 // Route to list all KixieCredentials
 router.get("/list", authMiddleware, KixieCredentialsController.listKixieCredentials);

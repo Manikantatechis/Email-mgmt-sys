@@ -3,17 +3,15 @@ const asyncHandler = require("express-async-handler");
 
 // Helper function to validate Gmail Credentials
 const validateGmailCredentials = (credentials) => {
-  const { email, oauthClientId, oauthClientSecret, oauthRefreshToken } = credentials;
+  const { email, oauthClientId, oauthClientSecret, oauthRefreshToken } =
+    credentials;
   return email && oauthClientId && oauthClientSecret && oauthRefreshToken;
 };
 
 // Helper function to find Gmail Credentials
 const findGmailCredentials = async (userId, type) => {
   return await GmailCredentials.find({
-    $or: [
-      { userId, type: "personal" },
-      { type: "global" }
-    ]
+    $or: [{ userId, type: "personal" }, { type: "global" }],
   });
 };
 
@@ -33,7 +31,11 @@ const addGmailCredentials = asyncHandler(async (req, res) => {
   }
 
   try {
-    const newCredentials = new GmailCredentials({ ...credentials, userId, type });
+    const newCredentials = new GmailCredentials({
+      ...credentials,
+      userId,
+      type,
+    });
     await newCredentials.save();
     res.status(201).json({ message: "Successfully added" });
   } catch (error) {
@@ -60,7 +62,12 @@ const listGmailEmails = asyncHandler(async (req, res) => {
   const { userId } = req;
 
   try {
-    const credentials = await findGmailCredentials(userId, "personal");
+    const credentials = await GmailCredentials.find({
+      $or: [
+        { userId, type: "personal", status: "active" },
+        { type: "global", status: "active" },
+      ],
+    });
     res.status(200).json(credentials.map(({ _id, email }) => ({ _id, email })));
   } catch (error) {
     res.status(500);
@@ -73,14 +80,17 @@ const editGmailCredentials = asyncHandler(async (req, res) => {
   const { role } = req;
 
   if (role !== "manager" && role !== "director") {
-    res.status(403);
-    throw new Error("You don't have permission to perform this action");
+    req.body.type = "personal";
   }
 
-  const { status } = req.body;
+  const { status, type } = req.body;
 
   try {
-    const updatedCredentials = await GmailCredentials.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    const updatedCredentials = await GmailCredentials.findByIdAndUpdate(
+      req.params.id,
+      { status, type },
+      { new: true }
+    );
 
     if (!updatedCredentials) {
       res.status(404);
@@ -98,5 +108,5 @@ module.exports = {
   listGmailEmails,
   listGmailCredentials,
   editGmailCredentials,
-  addGmailCredentials
+  addGmailCredentials,
 };

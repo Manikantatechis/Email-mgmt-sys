@@ -5,7 +5,6 @@ const algorithm = "aes-256-cbc";
 const ivLength = 16;
 
 function decryptData(data) {
-    console.log({data})
 	const iv = Buffer.from(data.slice(0, ivLength * 2), "hex");
 	const encryptedData = data.slice(ivLength * 2);
 	const decipher = crypto.createDecipheriv(algorithm, Buffer.from(encryptionKey), iv);

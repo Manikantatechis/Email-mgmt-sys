@@ -6,8 +6,8 @@ const SummaryTable = ({ summary, type }) => (
     <TableHead>
       <TableRow>
         <TableCell>Status</TableCell>
-        <TableCell>Name</TableCell>
-        <TableCell>{type === 'sms' ? 'Phone' : 'Email'}</TableCell>
+        {type === 'email' && <TableCell>To</TableCell>}
+        <TableCell>{type === 'sms' ? 'Phone' : 'Status'}</TableCell>
         <TableCell>Additional Info</TableCell>
       </TableRow>
     </TableHead>
@@ -15,14 +15,16 @@ const SummaryTable = ({ summary, type }) => (
       {summary.map((item, index) => (
         <TableRow key={index}>
           <TableCell>{item.status}</TableCell>
-          <TableCell>{item.value.Name || 'N/A'}</TableCell>
-          <TableCell>{item.value.Phone || item.value.Email || 'N/A'}</TableCell>
+          {type === 'email' && <TableCell>{item.value.to || 'N/A'}</TableCell>}
+          <TableCell>{type === 'sms' ? (item.value.Phone || 'N/A') : (item.value.status || 'N/A')}</TableCell>
           <TableCell>{item.value.reason || 'N/A'}</TableCell>
         </TableRow>
       ))}
     </TableBody>
   </Table>
 );
+
+
 
 const PreviewData = ({ resData, setResData }) => (
   <Container

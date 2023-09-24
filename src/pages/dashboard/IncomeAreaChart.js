@@ -28,8 +28,6 @@ const areaChartOptions = {
   }
 };
 
-// ==============================|| INCOME AREA CHART ||============================== //
-
 const IncomeAreaChart = ({ slot }) => {
   const theme = useTheme();
 
@@ -37,32 +35,29 @@ const IncomeAreaChart = ({ slot }) => {
   const line = theme.palette.divider;
 
   const [options, setOptions] = useState(areaChartOptions);
-
+  const [series, setSeries] = useState([]);
+  const mockData = {
+    month: {
+      emailSent: [350, 400, 320, 500, 420, 650, 380, 460, 420, 570, 630, 500],
+      emailOpened: [320, 350, 290, 480, 400, 620, 360, 440, 390, 550, 590, 470]
+    },
+    week: {
+      emailSent: [80, 90, 85, 88, 92, 87, 91],
+      emailOpened: [76, 82, 81, 84, 89, 83, 88]
+    }
+  };
+  
   useEffect(() => {
     setOptions((prevState) => ({
       ...prevState,
       colors: [theme.palette.primary.main, theme.palette.primary[700]],
       xaxis: {
-        categories:
-          slot === 'month'
-            ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        categories: slot === 'month' 
+            ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] 
             : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         labels: {
           style: {
-            colors: [
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary
-            ]
+            colors: new Array(12).fill(secondary)
           }
         },
         axisBorder: {
@@ -85,31 +80,39 @@ const IncomeAreaChart = ({ slot }) => {
         theme: 'light'
       }
     }));
-  }, [primary, secondary, line, theme, slot]);
 
-  const [series, setSeries] = useState([
-    {
-      name: 'Page Views',
-      data: [0, 86, 28, 115, 48, 210, 136]
-    },
-    {
-      name: 'Sessions',
-      data: [0, 43, 14, 56, 24, 105, 68]
-    }
-  ]);
-
-  useEffect(() => {
+    const dataForSlot = mockData[slot];
     setSeries([
       {
-        name: 'Page Views',
-        data: slot === 'month' ? [76, 85, 101, 98, 87, 105, 91, 114, 94, 86, 115, 35] : [31, 40, 28, 51, 42, 109, 100]
+        name: 'Emails Sent',
+        data: dataForSlot.emailSent
       },
       {
-        name: 'Sessions',
-        data: slot === 'month' ? [110, 60, 150, 35, 60, 36, 26, 45, 65, 52, 53, 41] : [11, 32, 45, 32, 34, 52, 41]
+        name: 'Emails Opened',
+        data: dataForSlot.emailOpened
       }
     ]);
-  }, [slot]);
+
+
+    // Fetching data from backend
+    // fetch(`/email-data?slot=${slot}`)
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     setSeries([
+    //       {
+    //         name: 'Emails Sent',
+    //         data: data.emailSent
+    //       },
+    //       {
+    //         name: 'Emails Opened',
+    //         data: data.emailOpened
+    //       }
+    //     ]);
+    //   })
+    //   .catch(error => {
+    //     console.error("Error fetching email data:", error);
+    //   });
+  }, [primary, secondary, line, theme, slot]);
 
   return <ReactApexChart options={options} series={series} type="area" height={450} />;
 };

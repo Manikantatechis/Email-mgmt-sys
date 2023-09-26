@@ -1,6 +1,9 @@
 const asyncHandler = require("express-async-handler");
 const { decrypt } = require("../utils/encrytpAndDecryptText");
 const EmailBatch = require("../models/emailModel");
+const { sendNotification } = require("../socketio");
+
+
 
 const emailTracking = asyncHandler(async (req, res) => {
     const encryptedData = req.query.data;
@@ -13,12 +16,11 @@ const emailTracking = asyncHandler(async (req, res) => {
             const decryptedData = decrypt(encryptedData);
             const trackingInfo = JSON.parse(decryptedData);
 
-            console.log(`Email opened with tracking Info: ${JSON.stringify(trackingInfo)} at ${new Date().toISOString()}`);
+            // console.log(`Email opened with tracking Info: ${JSON.stringify(trackingInfo)} at ${new Date().toISOString()}`);
 
             // Try to find the email in the openedEmail array
-            const emailBatch = await EmailBatch.findOne({
+            const emailBatch = await EmailBatch.findById({
                 _id: trackingInfo.batchId, 
-                "openedEmail.address": trackingInfo.Email.toLowerCase()
             });
 
             if (emailBatch) {
@@ -34,6 +36,8 @@ const emailTracking = asyncHandler(async (req, res) => {
                         }
                     }
                 );
+                console.log(emailBatch.userId)
+                sendNotification(emailBatch.userId, {message :"opened email",email: trackingInfo.Email, time:new Date()});
             } else {
                 // If the email doesn't exist, add a new entry
                 await EmailBatch.updateOne(
@@ -47,6 +51,7 @@ const emailTracking = asyncHandler(async (req, res) => {
                         }
                     }
                 );
+                sendNotification(emailBatch.userId, {message :"opened again",email: trackingInfo.Email, time:new Date()});
             }
 
         } catch (err) {
@@ -62,6 +67,10 @@ const emailTracking = asyncHandler(async (req, res) => {
     });
     res.end(pixel);
 });
+
+
+
+
 
 
 module.exports = { emailTracking };

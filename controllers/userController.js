@@ -99,10 +99,12 @@ const loginUser = asyncHandler(async (req, res) => {
 	});
 
 	res.status(200).json({
+		_id:user._id,
 		first_name: user.first_name,
 		last_name: user.last_name,
 		email: user.email,
 		role: user.role,
+		notifications: user.notifications
 	});
 });
 
@@ -180,6 +182,30 @@ const loginStatus = asyncHandler(async (req, res) => {
 	}
 });
 
+const markAllNotificationsAsSeen = async (req, res) => {
+    try {
+        const { userId } = req;
+
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.notifications.forEach(notification => {
+            notification.seen = true;
+        });
+
+        await user.save();
+
+        res.json({ message: 'All notifications marked as seen' });
+
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+
 module.exports = {
 	registerUser,
 	loginUser,
@@ -187,4 +213,5 @@ module.exports = {
 	updateUserInfo,
 	listUsers,
 	loginStatus,
+	markAllNotificationsAsSeen
 };

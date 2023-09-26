@@ -1,6 +1,6 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
-const { registerUser, loginUser, logoutUser, updateUserInfo, listUsers, loginStatus } = require("../controllers/userController");
+const { registerUser, loginUser, logoutUser, updateUserInfo, listUsers, loginStatus, markAllNotificationsAsSeen } = require("../controllers/userController");
 const isAuthenticated = require("../middlewares/authMiddleware");
 
 
@@ -23,6 +23,8 @@ router.get("/list", isAuthenticated, asyncHandler(listUsers));
 
 // Login Status
 router.get("/login-status", asyncHandler(loginStatus));
+
+router.get('/seen',isAuthenticated, markAllNotificationsAsSeen )
 
 
 module.exports = router;

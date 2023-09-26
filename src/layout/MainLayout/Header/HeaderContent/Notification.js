@@ -29,7 +29,7 @@ const Notification = () => {
   };
 
   const socket = useWebSocket({
-    url: 'http://localhost:5183',
+    url: process.env.REACT_APP_BACKEND_URL,
     query: { userId }
   });
 

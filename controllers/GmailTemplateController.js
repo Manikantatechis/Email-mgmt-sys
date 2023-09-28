@@ -21,7 +21,7 @@ const addGmailTemplate = asyncHandler(async (req, res) => {
     throw new Error("Missing required fields");
   }
 
-  if (role !== "manager" && role !== "director") {
+  if ((role !== "manager" && role !== "director") || !template_type) {
     templateData.template_type = "personal";
   }
 
@@ -79,7 +79,7 @@ const deleteGmailTemplate = asyncHandler(async (req, res) => {
   const { role, userId } = req;
   const { id } = req.params;
 
-  if (role !== "manager" && role !== "director") {
+  if ((role !== "manager" && role !== "director") || !template_type) {
     throw new Error("Access forbidden: insufficient role");
   }
 

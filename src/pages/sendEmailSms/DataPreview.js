@@ -63,6 +63,7 @@ const DataPreview = () => {
   const [pasteData, setPasteData] = useState('');
   const [actionType, setActionType] = useState(false);
   const [resData, setResData] = useState(null);
+const [loading, setIsLoading] = useState(false)
 
 
   const handleClick = (type)=>{
@@ -142,7 +143,6 @@ const handleClear = ()=>{
   const addRow = () => {
     dispatch({ type: 'ADD_ROW' });
   };
-
   return (
     <Container>
       <TextareaAutosize
@@ -193,7 +193,7 @@ const handleClear = ()=>{
           Send SMS & Email
         </Button>
       </Grid>
-      {actionType && <Confirm actionType={actionType} setActionType={setActionType} tableData={tableData} setResData={setResData} />}
+      {actionType && <Confirm loadingSend={loading} setIsSendLoading={setIsLoading} actionType={actionType} setActionType={setActionType} tableData={tableData} setResData={setResData} />}
       {console.log("after"
       ,resData)}
       {resData && <PreviewData resData={resData} setResData={setResData} />}

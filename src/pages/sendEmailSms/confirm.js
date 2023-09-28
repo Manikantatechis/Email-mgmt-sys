@@ -32,7 +32,7 @@ const Dropdown = ({ label, id, value, onChange, options, isLoading }) => (
   </Grid>
 );
 
-const Confirm = ({ actionType, setActionType, tableData, setResData }) => {
+const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend, setIsSendLoading }) => {
   const [kixieTemplate, setKixieTemplate] = useState('');
   const [emailTemplate, setEmailTemplate] = useState('');
   const [mailId, setMailId] = useState('');
@@ -82,6 +82,7 @@ const Confirm = ({ actionType, setActionType, tableData, setResData }) => {
 
   const handleSend = async () => {
     const actionData = {};
+    setIsSendLoading(true)
 
     if (actionType === SMS || actionType === BOTH) {
       actionData.kixieCredId = kixieNo;
@@ -98,6 +99,7 @@ const Confirm = ({ actionType, setActionType, tableData, setResData }) => {
 
       setResData(res)
       console.log(res)
+      setIsSendLoading(false)
     } catch (error) {
       console.log(error)
     }
@@ -108,6 +110,7 @@ const Confirm = ({ actionType, setActionType, tableData, setResData }) => {
     setMailId('');
     setKixieNo('');
     setActionType(false);
+    setIsSendLoading(false)
   };
 
   return (
@@ -177,9 +180,10 @@ const Confirm = ({ actionType, setActionType, tableData, setResData }) => {
           </>
         ) : null}
         <Grid item xs={12}>
-          <Button variant="contained" color="primary" onClick={handleSend} fullWidth>
-            Send
-          </Button>
+        <Button variant="contained" color="primary" onClick={handleSend} fullWidth disabled={loadingSend}>
+  {loadingSend ? <CircularProgress size={24} color="inherit" /> : 'Send'}
+</Button>
+
           <Button variant="contained" color="secondary" onClick={handleCancel} fullWidth style={{ marginTop: '10px' }}>
             Cancel
           </Button>

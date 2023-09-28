@@ -5,6 +5,8 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { handleRequest } from 'services/Api';
+import { useDispatch } from 'react-redux';
+import { addTemplate, editTemplate } from 'store/templates/templateSlice';
 
 const AddKixieTempate = ({ setIsKixieTemplateOpen, role, actionType }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -16,6 +18,9 @@ const AddKixieTempate = ({ setIsKixieTemplateOpen, role, actionType }) => {
     template_type: 'personal',
     content: ''
   });
+
+
+  const dispatch = useDispatch()
 
   const getKixieTemplateById = async () => {
     try {
@@ -53,11 +58,13 @@ const AddKixieTempate = ({ setIsKixieTemplateOpen, role, actionType }) => {
       let res = null
       if (id && type === 'edit') {
         res = await editKixieTemplate({ ...values }, id);
-
+        if(res && !res.message){
+          dispatch(editTemplate({type:"kixie", template:res}))
+        }
 
       } else {
         res = await addKixieTemplate({ ...values });
-
+        dispatch(addTemplate({type:"kixie", template:res}))
       }
       if (res && !res.message) {
         setIsKixieTemplateOpen(null);

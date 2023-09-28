@@ -11,7 +11,36 @@ const templateSlice = createSlice({
     isError: false,
     message: ''
   },
-  reducers: {},
+  reducers: {
+    addTemplate:(state, action)=>{
+      if(action.payload.type === "gmail"){
+        state.gmailTemplates = [...state.gmailTemplates, action.payload.template]
+      }
+      if(action.payload.type === "kixie"){
+        state.kixieTemplates = [...state.kixieTemplates, action.payload.template]
+      }
+    },
+    editTemplate: (state, action) => {
+      if (action.payload.type === "gmail") {
+        state.gmailTemplates = state.gmailTemplates.map((template) => {
+          if (template._id === action.payload.template._id) {
+            return action.payload.template; 
+          }
+          return template;
+        });
+      }
+      if (action.payload.type === "kixie") {
+        state.kixieTemplates = state.kixieTemplates.map((template) => {
+          if (template._id === action.payload.template._id) {
+            return action.payload.template;
+          }
+          return template;
+        });
+      }
+    }
+    
+        
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getGmailTemplates.pending, (state) => {
@@ -48,6 +77,10 @@ export const selectIsKixieLoading = (state) => state.templates.isKixieLoading;
 export const selectGmailTemplates = state => state.templates.gmailTemplates
 export const selectKixieTemplates = state => state.templates.kixieTemplates
 
+
+
+
+export const {addTemplate, editTemplate} = templateSlice.actions
 
 
 

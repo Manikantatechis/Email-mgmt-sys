@@ -14,7 +14,7 @@ const tableReducer = (state, action) => {
       newState[action.rowIndex][action.column] = action.value;
       return newState;
     case 'ADD_ROW':
-      return [...state, { 'SL No': '', Name: '', Phone: '', Email: '' }];
+      return [...state, { Name: '', Phone: '', Email: '' }];
 
       case 'CLEAR_DATA':
         return []
@@ -43,7 +43,8 @@ const MemoTableRow = memo(({ row, rowIndex, handleCellChange }) => {
 
   return (
     <TableRow key={rowIndex}>
-      {['SL No', 'Name', 'Phone', 'Email'].map((column) => (
+          <TableCell sx={{textAlign:"center"}} >{rowIndex +1}</TableCell>
+      {['Name', 'Phone', 'Email'].map((column) => (
         <TableCell key={column}>
           <TextField
             fullWidth
@@ -153,11 +154,11 @@ const handleClear = ()=>{
       <Button variant="contained" color="primary" onClick={handleParse} style={{ margin: '10px' }}>
         Parse Data
       </Button>
-      <Paper elevation={3} style={{ marginTop: '20px', overflow: 'scroll', height: '50vh' }}>
+      <Paper elevation={3} style={{ marginTop: '20px', overflow: 'scroll', height: '45vh' }}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell style={{ fontWeight: 'bold' }}>SL No</TableCell>
+              <TableCell style={{ fontWeight: 'bold', textAlign:"center" }}>SL No</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Name</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Phone</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Email</TableCell>

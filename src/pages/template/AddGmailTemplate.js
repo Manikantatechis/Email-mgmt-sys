@@ -18,6 +18,7 @@ import {
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { handleRequest } from 'services/Api';
+import { addTemplate, editTemplate } from 'store/templates/templateSlice';
 
 const AddGmailTemplate = ({ setIsGmailTemplateOpen, role, actionType }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -83,9 +84,16 @@ const AddGmailTemplate = ({ setIsGmailTemplateOpen, role, actionType }) => {
       let res = null
       if (id && type === 'edit') {
         res = await editGmailTemplate(payload, id);
+        
+        if(res && !res.message){
+          dispatch(editTemplate({type:"gmail", template:res}))
+        }
 
       } else {
         res = await addGmailTemplate(payload);
+        if(res && !res.message){
+          dispatch(addTemplate({type:"gmail", template:res}))
+        }
 
       }
 
@@ -202,7 +210,7 @@ const AddGmailTemplate = ({ setIsGmailTemplateOpen, role, actionType }) => {
                     </Stack>
                   </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid item xs={12} sx={{maxheight:"20vh"}}>
                     <Stack spacing={1}>
                       <InputLabel htmlFor="content">Content</InputLabel>
                       <OutlinedInput

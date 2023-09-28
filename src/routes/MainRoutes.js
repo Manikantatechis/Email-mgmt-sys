@@ -2,12 +2,13 @@ import { lazy } from 'react';
 
 // project import
 import Loadable from 'components/Loadable';
+import GmailTemplateManager from 'pages/template/gmailTemplateManager';
+import KixieTemplateManager from 'pages/template/kixieTemplateManager';
 import MainLayout from 'layout/MainLayout';
 import UserList from 'pages/authentication/userList';
 import DataPreview from 'pages/sendEmailSms/DataPreview';
 import AuthRegister from 'pages/authentication/auth-forms/AuthRegister';
 import CredentialManager from 'pages/credentials/credentialManager';
-import TemplateManager from 'pages/template/templateManager';
 
 // render - dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
@@ -79,11 +80,21 @@ const MainRoutes = {
         </AuthRoute>
       )
     },
+
     {
-      path: 'template',
+      path: 'templates/gmail',
       element: (
         <AuthRoute>
-          <TemplateManager />
+          <GmailTemplateManager />
+        </AuthRoute>
+      )
+    },
+    {
+      path: 'templates/kixie',
+      element: (
+        <AuthRoute>
+          {' '}
+          <KixieTemplateManager />
         </AuthRoute>
       )
     }

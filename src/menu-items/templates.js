@@ -15,20 +15,19 @@ const Templates = {
   type: 'group',
   children: [
     {
-      id: 'kixie-template',
-      title: 'Kixie / Email - Template',
+      id: 'email-template',
+      title: ' Gmail Templates',
       type: 'item',
-      url: '/template',
+      url: '/templates/gmail',
       icon: icons.ReadOutlined
-      }
-    // },
-    // {
-    //   id: 'email-template',
-    //   title: ' Template',
-    //   type: 'item',
-    //   url: '/template/email',
-    //   icon: icons.ReadOutlined
-    // }
+    },
+    {
+      id: 'kixie-template',
+      title: 'Kixie Templates',
+      type: 'item',
+      url: '/templates/kixie',
+      icon: icons.ReadOutlined
+    }
   ]
 };
 

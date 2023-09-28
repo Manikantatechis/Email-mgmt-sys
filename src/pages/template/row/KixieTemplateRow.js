@@ -3,11 +3,12 @@ import React, { useState } from 'react';
 import { TableCell, TableRow, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import truncateWithEllipsis from 'utils/truncate';
 
-const KixieTemplateRow = ({ _id, name, content, status, template_type, role, handleKixieTemplateEdit }) => {
+const KixieTemplateRow = ({index, _id, name, content, status, template_type, role, handleKixieTemplateEdit }) => {
   const [showPreview, setShowPreview] = useState(false);
 
   return (
     <TableRow key={_id}>
+      <TableCell>{index + 1}</TableCell>
       <TableCell>{name}</TableCell>
       <TableCell>{truncateWithEllipsis(content, 150)}</TableCell>
       <TableCell>{status}</TableCell>

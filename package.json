@@ -2,7 +2,7 @@
   "name": "EMS",
   "version": "1.1.2",
   "private": true,
-  "homepage": "https://techis.io",
+  "homepage": "https://email-mgmt-sys.netlify.app",
   "dependencies": {
     "@ant-design/colors": "^6.0.0",
     "@ant-design/icons": "^4.7.0",

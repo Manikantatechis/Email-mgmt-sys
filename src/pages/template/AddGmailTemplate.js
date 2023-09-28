@@ -210,12 +210,13 @@ const AddGmailTemplate = ({ setIsGmailTemplateOpen, role, actionType }) => {
                     </Stack>
                   </Grid>
 
-                  <Grid item xs={12} sx={{maxheight:"20vh"}}>
-                    <Stack spacing={1}>
+                  <Grid item xs={12}>
+                    <Stack spacing={1}sx={{maxHeight:"40vh", overflowY:"scroll"}}>
                       <InputLabel htmlFor="content">Content</InputLabel>
                       <OutlinedInput
                         id="content"
                         name="content"
+                        
                         value={values.content}
                         onChange={(e) => {
                           handleChange(e);
@@ -228,10 +229,9 @@ const AddGmailTemplate = ({ setIsGmailTemplateOpen, role, actionType }) => {
                         multiline
                       />
                       {errors.content && touched.content && <FormHelperText error>{errors.content}</FormHelperText>}
-                      {values.type === 'html' && preview && <div dangerouslySetInnerHTML={{ __html: preview }} />}
-                    </Stack>
+                      
+                    </Stack><br />{values.type === 'html' && preview && <div dangerouslySetInnerHTML={{ __html: preview }} />}
                   </Grid>
-
                   <Grid item xs={12}>
                     <Stack spacing={1}>
                       <InputLabel htmlFor="cc">CC</InputLabel>

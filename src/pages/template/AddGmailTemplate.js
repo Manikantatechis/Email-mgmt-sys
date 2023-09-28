@@ -1,4 +1,5 @@
 import { addGmailTemplate, editGmailTemplate } from 'services/templateService';
+import { useDispatch } from 'react-redux';
 
 import React, { useEffect, useState } from 'react';
 import {
@@ -31,6 +32,8 @@ const AddGmailTemplate = ({ setIsGmailTemplateOpen, role, actionType }) => {
     cc: [],
     bcc: []
   });
+
+  const dispatch = useDispatch()
 
   const getGmailTemplateById = async () => {
     try {

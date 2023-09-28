@@ -4,7 +4,11 @@ import { handleRequest } from 'services/Api';
 import useWebSocket from 'customHooks/useWebSocket';
 
 const Notification = () => {
-  const userId = JSON.parse(localStorage.getItem('userData'))._id;
+  const userData = JSON.parse(localStorage.getItem('userData'));
+  const userId = userData ? userData._id : "";
+  
+  // Now you can use userId safely without risking a null error
+  
 
   const initialNotifications = JSON.parse(localStorage.getItem('userNotifications')) || [];
   const unseenNotifications = initialNotifications.filter((notif) => !notif.seen);

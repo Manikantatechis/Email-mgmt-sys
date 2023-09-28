@@ -1,9 +1,20 @@
 import React, { useState, useEffect, useReducer, useCallback, memo } from 'react';
 import Papa from 'papaparse';
-import { Button, Table, TableBody, TableCell, TableHead, TableRow, Paper, TextareaAutosize, Container, TextField, Grid } from '@mui/material';
+import {
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+  TextareaAutosize,
+  Container,
+  TextField,Box,Typography,
+  Grid, Modal
+} from '@mui/material';
 import Confirm from './confirm';
 import PreviewData from './summaryTable';
-
 
 const tableReducer = (state, action) => {
   switch (action.type) {
@@ -16,8 +27,8 @@ const tableReducer = (state, action) => {
     case 'ADD_ROW':
       return [...state, { Name: '', Phone: '', Email: '' }];
 
-      case 'CLEAR_DATA':
-        return []
+    case 'CLEAR_DATA':
+      return [];
     default:
       return state;
   }
@@ -43,7 +54,7 @@ const MemoTableRow = memo(({ row, rowIndex, handleCellChange }) => {
 
   return (
     <TableRow key={rowIndex}>
-          <TableCell sx={{textAlign:"center"}} >{rowIndex +1}</TableCell>
+      <TableCell sx={{ textAlign: 'center' }}>{rowIndex + 1}</TableCell>
       {['Name', 'Phone', 'Email'].map((column) => (
         <TableCell key={column}>
           <TextField
@@ -63,17 +74,19 @@ const DataPreview = () => {
   const [pasteData, setPasteData] = useState('');
   const [actionType, setActionType] = useState(false);
   const [resData, setResData] = useState(null);
-const [loading, setIsLoading] = useState(false)
+  const [loading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
-
-  const handleClick = (type)=>{
-    if(tableData.length > 0){
-      setActionType(type)
-    }else{
-      alert("Failed to send : No table data available.")
+  const handleClick = (type) => {
+    if (tableData.length > 0) {
+      setActionType(type);
+    } else {
+      alert('Failed to send : No table data available.');
     }
-  }
-
+  };
+  const handleModal = () => {
+    setOpen(!open);
+  };
 
   const handleParse = () => {
     Papa.parse(pasteData, {
@@ -107,9 +120,9 @@ const [loading, setIsLoading] = useState(false)
 
     setPasteData('');
   };
-const handleClear = ()=>{
-  dispatch({ type: 'CLEAR_DATA'});
-}
+  const handleClear = () => {
+    dispatch({ type: 'CLEAR_DATA' });
+  };
   const handleCellChange = useCallback((e, rowIndex, column) => {
     let value = e.target.value;
 
@@ -139,12 +152,70 @@ const handleClear = ()=>{
     });
   }, []);
 
-
   const addRow = () => {
     dispatch({ type: 'ADD_ROW' });
   };
   return (
     <Container>
+      <Button variant="contained" onClick={handleModal} style={{ margin: '10px', position:"absolute", top:"0", marginTop:"12vh", right:20,  }}>
+        Instructions
+      </Button>
+      <Modal
+    open={open}
+    onClose={handleModal}
+    aria-labelledby="instruction-modal-title"
+    aria-describedby="instruction-modal-description"
+>
+    <Box 
+        sx={{ 
+            position: 'absolute', 
+            top: '50%', 
+            left: '50%', 
+            transform: 'translate(-50%, -50%)',
+            maxWidth: '80%',
+            width: '500px',
+            bgcolor: 'background.paper', 
+            boxShadow: 24, 
+            p: 4,
+            borderRadius: '10px'
+        }}
+    >
+        <Typography 
+            id="instruction-modal-title" 
+            variant="h6" 
+            component="h2" 
+            sx={{ borderBottom: '2px solid #f3f3f3', paddingBottom: '16px', marginBottom: '16px' }}
+        >
+            Instructions for Pasting Data
+        </Typography>
+        <Typography 
+            id="instruction-modal-description" 
+            sx={{ mt: 2, fontSize: '0.9rem' }}
+        >
+            1. Begin by copying the desired data from the CRM website and paste it into a Google Sheet.<br />
+            2. Ensure that the first row of your Google Sheet contains the headers: {"Name"}, {"Phone"}, and {"Email"}. The data will be parsed based on these headers.<br />
+            3. After populating the Google Sheet, copy it again and paste it into the provided textarea on this site.<br />
+            4. Please avoid copying and pasting data directly from the CRM website to this tool.<br />
+            5. Choose your preferred sending method: SMS, Email, or both according to your needs.<br />
+            6. Kindly note that the system can process up to 100 SMS and 100 emails at once.
+        </Typography>
+        <Button 
+            sx={{ 
+                mt: 2, 
+                backgroundColor: '#3f51b5', 
+                color: 'white',
+                '&:hover': {
+                    backgroundColor: '#303f9f'
+                }
+            }} 
+            variant="contained" 
+            onClick={handleModal}
+        >
+            Got it!
+        </Button>
+    </Box>
+</Modal>
+
       <TextareaAutosize
         placeholder="Paste your Excel data here"
         value={pasteData}
@@ -158,7 +229,7 @@ const handleClear = ()=>{
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell style={{ fontWeight: 'bold', textAlign:"center" }}>SL No</TableCell>
+              <TableCell style={{ fontWeight: 'bold', textAlign: 'center' }}>SL No</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Name</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Phone</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Email</TableCell>
@@ -173,13 +244,12 @@ const handleClear = ()=>{
       </Paper>
       <Grid>
         <Button variant="contained" color="primary" onClick={addRow} style={{ margin: '10px' }}>
-        Add Row
-      </Button>
-      <Button variant="contained" style={{ backgroundColor: 'rgb(243 69 69)', color: 'white', margin: '10px' }} onClick={handleClear}>
-        Clear 
-      </Button>
+          Add Row
+        </Button>
+        <Button variant="contained" style={{ backgroundColor: 'rgb(243 69 69)', color: 'white', margin: '10px' }} onClick={handleClear}>
+          Clear
+        </Button>
       </Grid>
-      
 
       {/* buttons for sending SMS, Email, and both */}
       <Grid style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
@@ -193,9 +263,17 @@ const handleClear = ()=>{
           Send SMS & Email
         </Button>
       </Grid>
-      {actionType && <Confirm loadingSend={loading} setIsSendLoading={setIsLoading} actionType={actionType} setActionType={setActionType} tableData={tableData} setResData={setResData} />}
-      {console.log("after"
-      ,resData)}
+      {actionType && (
+        <Confirm
+          loadingSend={loading}
+          setIsSendLoading={setIsLoading}
+          actionType={actionType}
+          setActionType={setActionType}
+          tableData={tableData}
+          setResData={setResData}
+        />
+      )}
+      {console.log('after', resData)}
       {resData && <PreviewData resData={resData} setResData={setResData} />}
     </Container>
   );

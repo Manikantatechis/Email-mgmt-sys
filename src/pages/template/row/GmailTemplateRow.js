@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { TableCell, TableRow, Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid } from '@mui/material';
 
 const GmailTemplateRow = ({index, _id, subject, html, content, status, template_type, cc, bcc, role, type, handleGmailTemplateEdit }) => {
-  console.log({ role });
+  // console.log({ role });
 
   const [showPreview, setShowPreview] = useState(false);
 

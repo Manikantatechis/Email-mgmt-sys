@@ -93,12 +93,12 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
       actionData.emailCredId = mailId;
       actionData.emailTemplateId = emailTemplate;
     }
-    console.log({ actionData, tableData, actionType });
+    // console.log({ actionData, tableData, actionType });
     try {
       const res = await sendMessage({ actionData, tableData, actionType });
 
       setResData(res)
-      console.log(res)
+      // console.log(res)
       setIsSendLoading(false)
     } catch (error) {
       console.log(error)

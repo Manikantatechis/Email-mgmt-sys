@@ -273,7 +273,7 @@ const DataPreview = () => {
           setResData={setResData}
         />
       )}
-      {console.log('after', resData)}
+      {/* {console.log('after', resData)} */}
       {resData && <PreviewData resData={resData} setResData={setResData} />}
     </Container>
   );

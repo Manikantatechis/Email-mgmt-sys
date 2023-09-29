@@ -8,6 +8,7 @@ const SummaryTable = ({ summary, type }) => (
         <TableCell>SL No</TableCell>
         {type === 'email' && <TableCell>To</TableCell>}
         <TableCell>{type === 'sms' ? 'Phone' : 'Status'}</TableCell>
+        <TableCell>Status</TableCell>
         <TableCell>Additional Info</TableCell>
       </TableRow>
     </TableHead>
@@ -17,6 +18,8 @@ const SummaryTable = ({ summary, type }) => (
           <TableCell>{index + 1}</TableCell>
           {type === 'email' && <TableCell>{item.value.to || 'N/A'}</TableCell>}
           <TableCell>{type === 'sms' ? (item.value.Phone || 'N/A') : (item.value.status || 'N/A')}</TableCell>
+          <TableCell>{item.value.status}</TableCell>
+
           <TableCell>{item.value.reason || 'N/A'}</TableCell>
         </TableRow>
       ))}
@@ -65,3 +68,5 @@ const PreviewData = ({ resData, setResData }) => (
 );
 
 export default PreviewData;
+
+

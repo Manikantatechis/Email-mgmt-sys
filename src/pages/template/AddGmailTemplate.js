@@ -41,7 +41,7 @@ const AddGmailTemplate = ({ setIsGmailTemplateOpen, role, actionType }) => {
       const res = await handleRequest('get', `/api/gmail-template/list/${id}`);
       if (res) {
         setInitialState({...res, content:res.html ? res.html : res.content });
-        console.log(res);
+        // console.log(res);
         setDataLoaded(true);
         if (res.type === 'html') {
           setPreview(res.html);
@@ -91,6 +91,7 @@ const AddGmailTemplate = ({ setIsGmailTemplateOpen, role, actionType }) => {
 
       } else {
         res = await addGmailTemplate(payload);
+
         if(res && !res.message){
           dispatch(addTemplate({type:"gmail", template:res}))
         }

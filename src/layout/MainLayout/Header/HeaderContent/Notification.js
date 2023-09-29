@@ -29,7 +29,7 @@ const Notification = () => {
       setViewAll(false);
       return false;
     });
-    console.log(viewAll);
+    // console.log(viewAll);
   };
 
   const socket = useWebSocket({

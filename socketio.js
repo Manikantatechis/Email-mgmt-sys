@@ -46,7 +46,7 @@ sendNotification = async (userId, data) => {
     return;
   }
 
-  console.log(`Attempting to send notification to user ${userId}`);
+  // console.log(`Attempting to send notification to user ${userId}`);
 
   // Always save the notification in the database
   await saveNotificationToDB(userId, data);
@@ -54,7 +54,7 @@ sendNotification = async (userId, data) => {
   const userSocket = clients[userId];
   if (userSocket) {
     userSocket.emit("notification", {data});
-    console.log({data})
+    // console.log({data})
   } else {
     console.error(`No socket found for user ${userId}. Notification saved to database.`);
   }
@@ -80,9 +80,9 @@ const saveNotificationToDB = async (userId, data) => {
       });
 
       // Save updated user
-      console.log(user);
+      // console.log(user);
       await user.save();
-      console.log(`Notification saved for user ${userId}`);
+      // console.log(`Notification saved for user ${userId}`);
 
   } catch (error) {
       console.error("Error saving notification:", error);

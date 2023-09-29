@@ -36,7 +36,7 @@ const emailTracking = asyncHandler(async (req, res) => {
                         }
                     }
                 );
-                console.log(emailBatch.userId)
+                // console.log(emailBatch.userId)
                 sendNotification(emailBatch.userId, {message :"opened email",email: trackingInfo.Email, time:new Date()});
             } else {
                 // If the email doesn't exist, add a new entry

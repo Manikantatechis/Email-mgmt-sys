@@ -14,12 +14,12 @@ function generateEmail(
 ) {
   const trackingData = JSON.stringify({ batchId, Email, Name });
   const encryptedTrackingData = encrypt(trackingData);
-  console.log(`http://localhost:5183/api/track?data=${encryptedTrackingData}`)
+  // console.log(`http://localhost:5183/api/track?data=${encryptedTrackingData}`)
   const trackingPixel = `<img src="${process.env.BACKEND_URL}/api/track?data=${encryptedTrackingData}" width="1" height="1" alt="" crossorigin="anonymous"/>`;
 
-  console.log(
-    `${process.env.BACKEND_URL}/api/track?data=${encryptedTrackingData}`
-  );
+  // console.log(
+  //   `${process.env.BACKEND_URL}/api/track?data=${encryptedTrackingData}`
+  // );
 
   const subject = gmailTemplate.subject;
   let emailBody;
@@ -111,7 +111,7 @@ async function sendEmail(
   ).length;
 
   const res = await saveBatch(batchId, userId, successfulEmails, gmailCredentials._id, gmailTemplate._id);
-  console.log(res)
+  // console.log(res)
   return emailResults;
 }
 

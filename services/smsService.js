@@ -21,7 +21,15 @@ async function sendSms(kixieCredentials, kixieTemplate, tableData) {
 
 		try {
 			const res = await axios.post("https://apig.kixie.com/itn/sendmms", form, { headers: { ...form.getHeaders() } });
-			return { Name, Phone, status: "Success" };
+			// console.log(res)
+			if(res.data.error){
+				  throw new Error(res.data.error);  
+			}else if(res.data.success){
+				return { Name, Phone, status: "Success" };
+			}else{
+				throw new Error("Something went wrong try again");  
+			}
+			
 		} catch (error) {
 			console.error("SMS Error:", error);
 			return { Name, Phone, status: "Failed", reason: error.message };

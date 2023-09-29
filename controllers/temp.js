@@ -233,7 +233,7 @@ const sendMessages = asyncHandler(async (req, res) => {
             const trackingPixel = `<img src="http://localhost:8000/api/track?trackingId=${trackingId}" width="1" height="1" alt="" crossorigin="anonymous"/>`;
             const personalizedHtml = gmailTemplate.html.replace(/\$\{name\}/g, Name) +
                     trackingPixel;
-					console.log(personalizedHtml)
+					// console.log(personalizedHtml)
 
             const mailOptions = {
                 from: gmailCredentials.email,

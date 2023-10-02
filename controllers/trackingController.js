@@ -15,17 +15,18 @@ const emailTracking = asyncHandler(async (req, res) => {
         try {
             const decryptedData = decrypt(encryptedData);
             const trackingInfo = JSON.parse(decryptedData);
-
-            // console.log(`Email opened with tracking Info: ${JSON.stringify(trackingInfo)} at ${new Date().toISOString()}`);
-
-            // Try to find the email in the openedEmail array
+    
             const emailBatch = await EmailBatch.findById({
                 _id: trackingInfo.batchId, 
             });
-
-            if (emailBatch) {
-                // If the email exists, push the new timestamp
-                await EmailBatch.updateOne(
+            console.log({decryptedData})
+    
+            // Check if an email entry already exists
+            const existingEmail = emailBatch.openedEmail.find(email => email.address === trackingInfo.Email.toLowerCase());
+    
+            if (existingEmail) {
+                // If the email entry exists, push the new timestamp
+                const res = await EmailBatch.updateOne(
                     {
                         _id: trackingInfo.batchId,
                         "openedEmail.address": trackingInfo.Email.toLowerCase()
@@ -36,11 +37,11 @@ const emailTracking = asyncHandler(async (req, res) => {
                         }
                     }
                 );
-                // console.log(emailBatch.userId)
-                sendNotification(emailBatch.userId, {message :"opened email",email: trackingInfo.Email, time:new Date()});
+                console.log(res)
+                sendNotification(emailBatch.userId, {message: "opened again", email: trackingInfo.Email, time: new Date()});
             } else {
-                // If the email doesn't exist, add a new entry
-                await EmailBatch.updateOne(
+                // If the email entry doesn't exist, add a new entry
+                const res = await EmailBatch.updateOne(
                     { _id: trackingInfo.batchId },
                     {
                         $push: {
@@ -49,15 +50,17 @@ const emailTracking = asyncHandler(async (req, res) => {
                                 openedTimestamps: [new Date()]
                             }
                         }
-                    }
+                    },
                 );
-                sendNotification(emailBatch.userId, {message :"opened again",email: trackingInfo.Email, time:new Date()});
+                console.log({res})
+                sendNotification(emailBatch.userId, {message: "opened email", email: trackingInfo.Email, time: new Date()});
             }
-
+    
         } catch (err) {
             console.error("Error decrypting or processing the data:", err);
         }
     }
+    
 
     // Return a 1x1 pixel image to the client.
     const pixel = Buffer.from("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", "base64");

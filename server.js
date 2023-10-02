@@ -11,6 +11,7 @@ const gmailTemplateRoutes = require("./routes/GmailTemplateRoutes");
 const kixieTemplateRoutes = require("./routes/KixieTemplateRoutes");
 const sendSmsRoutes = require("./routes/sendMessageRoute");
 const trackRoute = require("./routes/trackRoute");
+const reportRoutes = require("./routes/ReportsRoute")
 const helmet = require("helmet");
 const http = require("http");
 const socketIo = require("socket.io");
@@ -77,6 +78,7 @@ app.use("/api/gmail-template", gmailTemplateRoutes);
 app.use("/api/kixie-template", kixieTemplateRoutes);
 app.use("/api/message", sendSmsRoutes);
 app.use("/api/track", trackRoute);
+app.use("/reports", reportRoutes)
 
 const PORT = process.env.PORT || 8000;
 

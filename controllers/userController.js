@@ -55,20 +55,10 @@ const registerUser = asyncHandler(async (req, res) => {
 	//Generate Token
 	const token = generateToken(newUser._id, newUser.role);
 
-	//send HTTP-only cookie
-	res.cookie("token", token, {
-		path: "/",
-		httpOnly: true,
-		expires: new Date(Date.now() + 1000 * 86400), // 1 day
-		sameSite: "none",
-		secure: true,
-	});
+	
 
 	res.status(201).json({
-		first_name: newUser.first_name,
-		last_name: newUser.last_name,
-		email: newUser.email,
-		role: newUser.role,
+		message:"User added successfully"
 	});
 });
 

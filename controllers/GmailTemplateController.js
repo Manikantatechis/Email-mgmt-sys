@@ -21,7 +21,7 @@ const addGmailTemplate = asyncHandler(async (req, res) => {
     throw new Error("Missing required fields");
   }
 
-  if ((role !== "manager" && role !== "director") || !template_type) {
+  if ((role !== "manager" && role !== "director") || !templateData.template_type) {
     templateData.template_type = "personal";
   }
 

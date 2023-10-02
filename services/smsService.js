@@ -1,7 +1,8 @@
 const axios = require("axios");
 const FormData = require("form-data");
+const kixieBatch = require("../models/kixieModel");
 
-async function sendSms(kixieCredentials, kixieTemplate, tableData) {
+async function sendSms(kixieCredentials, kixieTemplate, tableData, batchId,  userId) {
 	const smsPromises = tableData.map(async ({ Name, Phone }) => {
 		const form = new FormData();
 		const formData = {
@@ -36,7 +37,29 @@ async function sendSms(kixieCredentials, kixieTemplate, tableData) {
 		}
 	});
 
-	return await Promise.allSettled(smsPromises);
+	const smsResults = await Promise.allSettled(smsPromises);
+
+  const successfulSms = smsResults.filter(res => res.status === "fulfilled" && res.value && res.value.status === "Success");
+
+  if (successfulSms.length > 0) {
+    // Create a new record for the kixie batch
+    const batch = new kixieBatch({
+      _id: batchId, 
+      userId: userId,
+      kixieCredentialId: kixieCredentials._id,  // Assuming kixieCredentials object has an _id
+      kixieTemplateId: kixieTemplate._id,  // Assuming kixieTemplate object has an _id
+      smsCount: successfulSms.length
+    });
+
+    try {
+      await batch.save();
+      console.log('Batch record saved successfully');
+    } catch (error) {
+      console.error('Error saving batch record:', error);
+    }
+  }
+
+  return smsResults;
 }
 
 module.exports = sendSms;

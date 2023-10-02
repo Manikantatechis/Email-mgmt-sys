@@ -1,20 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const openedEmailSchema = new Schema({
-    address: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true
-    },
-    openedTimestamps: [{
-        type: Date,
-        default: Date.now
-    }]
-});
-
-const emailBatchSchema = new Schema({
+const kixieBatchSchema = new Schema({
     _id: {
         type: String,
         required: true
@@ -24,12 +11,12 @@ const emailBatchSchema = new Schema({
         ref: 'User',  
         required: true
     },
-    emailCredentialId: {  
+    kixieCredentialId: {  
         type: Schema.Types.ObjectId,
         ref: 'GmailCredentials',  
         required: true
     },
-    emailTemplateId: {  
+    kixieTemplateId: {  
         type: Schema.Types.ObjectId,
         ref: 'GmailTemplate',  
         required: true
@@ -38,13 +25,12 @@ const emailBatchSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    emailCount: {
+    smsCount: {
         type: Number,
         required: true
     },
-    openedEmail: [openedEmailSchema]
 });
 
-const EmailBatch = mongoose.model("EmailBatch", emailBatchSchema);
+const kixieBatch = mongoose.model("kixieBatch", kixieBatchSchema);
 
-module.exports = EmailBatch;
+module.exports = kixieBatch;

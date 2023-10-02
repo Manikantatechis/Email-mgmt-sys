@@ -1,9 +1,13 @@
 const EmailBatch = require("../models/emailModel");
+const asyncHandler = require("express-async-handler");
+const kixieBatch = require("../models/kixieModel");
 
-const getEmailData = async (req, res) => {
+const getEmailData = 
+asyncHandler(async (req, res) => {
   try {
     // req.query.slot = "week"
     const slot = req.query.slot || "month";
+    console.log(slot)
 
     const responseData = {
       emailSent: slot === "month" ? Array(12).fill(0) : Array(7).fill(0),
@@ -48,8 +52,52 @@ const getEmailData = async (req, res) => {
       .status(500)
       .json({ message: "Error fetching email data", error: error.message });
   }
-};
+});
+
+const getSMSData = asyncHandler(
+
+async (req, res) => {
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    let today = new Date();
+    let weekData = new Array(7).fill(0);
+
+    for (let i = 0; i < 7; i++) {
+        let startOfDay = new Date(today);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        let endOfDay = new Date(today);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        let aggregatedData = await kixieBatch.aggregate([
+            {
+                $match: {
+                    timestamp: {
+                        $gte: startOfDay,
+                        $lte: endOfDay
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalSMS: { $sum: "$smsCount" }
+                }
+            }
+        ]);
+
+        let count = aggregatedData.length ? aggregatedData[0].totalSMS : 0;
+
+        weekData[daysOfWeek.indexOf(daysOfWeek[today.getDay()])] = count;
+
+        // Move to previous day
+        today.setDate(today.getDate() - 1);
+    }
+
+    res.json(weekData);
+});
 
 
 
-module.exports = {getEmailData};
+
+
+module.exports = {getEmailData, getSMSData};

@@ -23,6 +23,9 @@ const sendMessages = asyncHandler(async (req, res) => {
   let smsSummary = [],
     emailSummary = [];
 
+    const batchId = generateBatchId(userId);
+
+
   if (actionType === "sms" || actionType === "both") {
     const kixieCredentials = await getDecryptedCredentials(
       KixieCredentials,
@@ -35,11 +38,10 @@ const sendMessages = asyncHandler(async (req, res) => {
       KixieTemplate,
       actionData.kixieTemplateId
     );
-    smsSummary = await sendSms(kixieCredentials, kixieTemplate, tableData);
+    smsSummary = await sendSms(kixieCredentials, kixieTemplate, tableData, batchId,  userId);
   }
 
   if (actionType === "email" || actionType === "both") {
-    const batchId = generateBatchId(userId);
 
     const gmailCredentials = await getDecryptedCredentials(
       GmailCredentials,

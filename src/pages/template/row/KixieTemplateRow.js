@@ -29,7 +29,7 @@ const KixieTemplateRow = ({index, _id, name, content, status, template_type, rol
         </Dialog>
       </TableCell>
     </TableRow>
-  );
+  ); 
 };
 
 export default KixieTemplateRow;

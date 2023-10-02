@@ -19,6 +19,7 @@ const Notification = () => {
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
+    setViewAll(false);
   };
 
   const handleClose = (event) => {
@@ -29,7 +30,6 @@ const Notification = () => {
       setViewAll(false);
       return false;
     });
-    // console.log(viewAll);
   };
 
   const socket = useWebSocket({

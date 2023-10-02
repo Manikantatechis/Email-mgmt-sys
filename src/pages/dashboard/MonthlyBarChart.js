@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
-
-// material-ui
-import { useTheme } from '@mui/material/styles';
-
-// third-party
-import ReactApexChart from 'react-apexcharts';
 
 // chart options
+
+
+
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useTheme } from '@mui/material/styles';
+import ReactApexChart from 'react-apexcharts'; // Assuming this is how you import it
+import { getSMSReport } from 'store/reports/reportsThunk';
 const barChartOptions = {
   chart: {
     type: 'bar',
@@ -41,23 +42,43 @@ const barChartOptions = {
   }
 };
 
-// ==============================|| MONTHLY BAR CHART ||============================== //
+
+
 
 const MonthlyBarChart = () => {
   const theme = useTheme();
-
-  const { primary, secondary } = theme.palette.text;
-  const info = theme.palette.info.light;
-
-  const [series] = useState([
-    {
-      data: [80, 95, 70, 42, 65, 55, 78]
-    }
-  ]);
+  const dispatch = useDispatch();
+  
+  const smsData = useSelector(state => state.reports.smsData);  // Using a selector just like in the IncomeAreaChart
 
   const [options, setOptions] = useState(barChartOptions);
+  const [series, setSeries] = useState([{ name: 'SMS Count', data: smsData }]);
 
   useEffect(() => {
+    if (smsData && smsData.length > 0) {
+      setSeries([{ name: 'SMS Count', data: smsData }]);
+    } else {
+      const localStorageData = JSON.parse(localStorage.getItem('smsData'));
+
+      if (localStorageData) {
+        setSeries([{ name: 'SMS Count', data: localStorageData }]);
+      } else {
+        dispatch(getSMSReport()).then(action => {
+          if (getSMSReport.fulfilled.match(action)) {
+            const response = action.payload.report;
+            if (response) {
+              setSeries([{ name: 'SMS Count', data: response }]);
+            }
+          }
+        });
+      }
+    }
+  }, [dispatch, smsData]);
+
+  useEffect(() => {
+    const {secondary } = theme.palette.text;
+    const info = theme.palette.info.light;
+
     setOptions((prevState) => ({
       ...prevState,
       colors: [info],
@@ -72,8 +93,7 @@ const MonthlyBarChart = () => {
         theme: 'light'
       }
     }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [primary, info, secondary]);
+  }, [theme]);
 
   return (
     <div id="chart">
@@ -83,3 +103,4 @@ const MonthlyBarChart = () => {
 };
 
 export default MonthlyBarChart;
+

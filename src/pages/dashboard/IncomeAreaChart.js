@@ -1,11 +1,15 @@
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
 
 // third-party
 import ReactApexChart from 'react-apexcharts';
+import { getEmailReport } from 'store/reports/reportsThunk';
+import { useSelector } from '../../../node_modules/react-redux/es/exports';
+import { selectMonthlyEmailReport, selectWeeklyEmailReport } from 'store/reports/reportsSlice';
 
 // chart options
 const areaChartOptions = {
@@ -36,16 +40,69 @@ const IncomeAreaChart = ({ slot }) => {
 
   const [options, setOptions] = useState(areaChartOptions);
   const [series, setSeries] = useState([]);
-  const mockData = {
-    month: {
-      emailSent: [350, 400, 320, 500, 420, 650, 380, 460, 420, 570, 630, 500],
-      emailOpened: [320, 350, 290, 480, 400, 620, 360, 440, 390, 550, 590, 470]
-    },
-    week: {
-      emailSent: [80, 90, 85, 88, 92, 87, 91],
-      emailOpened: [76, 82, 81, 84, 89, 83, 88]
+
+
+
+  const dispatch = useDispatch()
+
+
+  const dataForSlot = useSelector(
+    slot === "month" ? selectMonthlyEmailReport : selectWeeklyEmailReport
+  );
+
+
+
+  useEffect(() => {
+    console.log(dataForSlot)
+    console.log(dataForSlot && Object.keys(dataForSlot).length === 0)
+    if (dataForSlot && Object.keys(dataForSlot).length === 0) {
+      const localStorageData = JSON.parse(localStorage.getItem(slot));
+
+      if (localStorageData && localStorageData.emailSent && localStorageData.emailOpened) {
+        setSeries([
+          {
+            name: "Emails Sent",
+            data: localStorageData.emailSent ,
+          },
+          {
+            name: "Emails Opened",
+            data: localStorageData.emailOpened,
+          },
+        ]);
+      } else {
+        dispatch(getEmailReport(slot)).then(action => {
+          // Checking if the action was fulfilled
+          if (getEmailReport.fulfilled.match(action)) {
+            const response = action.payload.report;
+            if (response?.emailSent && response?.emailOpened) {
+              setSeries([
+                {
+                  name: "Emails Sent",
+                  data: response.emailSent,
+                },
+                {
+                  name: "Emails Opened",
+                  data: response.emailOpened,
+                },
+              ]);
+            }
+          }
+        });
+        }
+      }
+    else{
+      setSeries([
+        {
+          name: "Emails Sent",
+          data: dataForSlot.emailSent,
+        },
+        {
+          name: "Emails Opened",
+          data: dataForSlot.emailOpened,
+        },
+      ]);
     }
-  };
+  }, [slot, dispatch, dataForSlot]);
   
   useEffect(() => {
     setOptions((prevState) => ({
@@ -81,38 +138,10 @@ const IncomeAreaChart = ({ slot }) => {
       }
     }));
 
-    const dataForSlot = mockData[slot];
-    setSeries([
-      {
-        name: 'Emails Sent',
-        data: dataForSlot.emailSent
-      },
-      {
-        name: 'Emails Opened',
-        data: dataForSlot.emailOpened
-      }
-    ]);
-
-
-    // Fetching data from backend
-    // fetch(`/email-data?slot=${slot}`)
-    //   .then(response => response.json())
-    //   .then(data => {
-    //     setSeries([
-    //       {
-    //         name: 'Emails Sent',
-    //         data: data.emailSent
-    //       },
-    //       {
-    //         name: 'Emails Opened',
-    //         data: data.emailOpened
-    //       }
-    //     ]);
-    //   })
-    //   .catch(error => {
-    //     console.error("Error fetching email data:", error);
-    //   });
   }, [primary, secondary, line, theme, slot]);
+
+
+
 
   return <ReactApexChart options={options} series={series} type="area" height={450} />;
 };

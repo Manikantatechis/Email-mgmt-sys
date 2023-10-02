@@ -110,33 +110,48 @@ const NotificationDisplay = ({ displayedNotifications, open,handleClick,  handle
                    >
                      {displayedNotifications.map((notification, idx) => (
                        <React.Fragment key={idx}>
-                         <ListItemButton>
+                       <ListItemButton>
                            <ListItemAvatar>
-                             <Avatar
-                               sx={{
-                                 color: 'primary.main',
-                                 bgcolor: 'primary.lighter'
-                               }}
-                             >
-                               E
-                             </Avatar>
+                               <Avatar
+                                   sx={{
+                                       color: 'primary.main',
+                                       bgcolor: 'primary.lighter'
+                                   }}
+                               >
+                                   E
+                               </Avatar>
                            </ListItemAvatar>
                            <ListItemText
-                             primary={
-                               <Typography variant="h6">
-                                 {notification.message} for email: {notification.email}
-                              </Typography>
-                            }
-                            secondary={new Date(notification.time).toLocaleString()}
-                          />
-                          <ListItemSecondaryAction>
-                            <Typography variant="caption" noWrap>
-                              {new Date(notification.time).toLocaleTimeString()}
-                            </Typography>
-                          </ListItemSecondaryAction>
-                        </ListItemButton>
-                        <Divider />
-                      </React.Fragment>
+                               primary={
+                                   <Typography variant="h6">
+                                       {notification.message === "opened email" 
+                                         ? `User ${notification.email} opened the email.` 
+                                         : `User ${notification.email} reopened the email.`}
+                                   </Typography>
+                               }
+                               secondary={
+                                   new Date(notification.time).toLocaleString('en-US', {
+                                       hour: 'numeric',
+                                       minute: 'numeric',
+                                       hour12: true
+                                   })
+                               }
+                           />
+                           <ListItemSecondaryAction>
+                               <Typography variant="caption" noWrap>
+                                   {
+                                       new Date(notification.time).toLocaleTimeString('en-US', {
+                                           hour: 'numeric',
+                                           minute: 'numeric',
+                                           hour12: true
+                                       })
+                                   }
+                               </Typography>
+                           </ListItemSecondaryAction>
+                       </ListItemButton>
+                       <Divider />
+                   </React.Fragment>
+                   
                     ))}
                     <ListItemButton sx={{ textAlign: 'center', py: `${12}px !important` }}>
                       <ListItemText

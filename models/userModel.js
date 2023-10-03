@@ -58,6 +58,11 @@ const userSchema = mongoose.Schema({
     type: String,
     enum: ["director", "manager", "user", "engineer"],
   },
+  status: {
+    type: String,
+    enum: ["active", "inactive"],
+    default: "active",
+  },
   notifications: [notificationSchema], // Add the notifications field
 });
 

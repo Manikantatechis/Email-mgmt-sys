@@ -60,7 +60,7 @@ const editGmailTemplate = asyncHandler(async (req, res) => {
   const { role, userId } = req;
   const { id } = req.params;
   const updates = req.body;
-  if (role !== "director" || role !== "manager") {
+  if (role !== "manager" && role !== "director") {
     updates.template_type = "personal";
   }
   const template = await GmailTemplate.findOneAndUpdate({ _id: id }, updates, {

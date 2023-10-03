@@ -114,7 +114,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 const updateUserInfo = asyncHandler(async (req, res) => {
 	const loggedInUserId = req.userId;
 
-	const loggedInUser = await User.findById(loggedInUserId);
+	const loggedInUser = await User.findById(loggedInUserId).select("_id role");
 
 	const userIdToUpdate = req.params.userId;
 	const userToUpdate = await User.findById(userIdToUpdate);
@@ -129,16 +129,15 @@ const updateUserInfo = asyncHandler(async (req, res) => {
 		res.status(403).send("Not authorized to update this user");
 	}
 
-	const { first_name, last_name, role, password } = req.body;
+	const { role, password, status } = req.body;
 
-	if (first_name) userToUpdate.first_name = first_name;
-	if (last_name) userToUpdate.last_name = last_name;
+	if (status) userToUpdate.status = status;
 	if (role) userToUpdate.role = role;
 	if (password) userToUpdate.password = password;
 
 	await userToUpdate.save();
 
-	res.status(200).json(userToUpdate);
+	res.status(200).json({message:"user updated successfully"});
 });
 
 // List Users
@@ -149,12 +148,12 @@ const listUsers = asyncHandler(async (req, res) => {
 	let query = {};
 
 	if (loggedInUser.role === "manager") {
-		query.role = { $in: ["engineer", "user"] };
+		query.role = { $in: ["manager", "engineer", "user"] };
 	} else if (loggedInUser.role !== "director") {
 		query._id = loggedInUserId;
 	}
 
-	const users = await User.find(query).select("-password");
+	const users = await User.find(query).select("_id first_name last_name email role status ");
 	res.status(200).json(users);
 });
 

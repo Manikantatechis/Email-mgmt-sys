@@ -23,15 +23,15 @@ function generateEmail(
 
   const subject = gmailTemplate.subject;
   let emailBody;
-
+  let rawEmailBody;
   if (gmailTemplate.type === "html") {
-    emailBody =
-      (gmailTemplate.html || "").replace(/\$\{name\}/g, Name) + trackingPixel;
+      rawEmailBody = (gmailTemplate.html || "");
   } else {
-    emailBody =
-      (gmailTemplate.content || "").replace(/\$\{name\}/g, Name) +
-      trackingPixel;
+      rawEmailBody = (gmailTemplate.content || "");
   }
+  
+  // Replace name and date in the content
+  emailBody = replaceDateInTemplate(rawEmailBody.replace(/\$\{name\}/g, Name)) + trackingPixel;
 
   const mailOptions = {
     from: gmailCredentials.email,
@@ -42,7 +42,7 @@ function generateEmail(
   if (gmailTemplate.type === "html") {
     mailOptions.html = emailBody;
   } else {
-    mailOptions.text = emailBody;
+    mailOptions.html = emailBody;
   }
 
   if (gmailTemplate.cc && gmailTemplate.cc.length > 0) {
@@ -139,4 +139,25 @@ async function saveBatch(
   }
 
   return savedBatch;
+}
+
+
+
+function formatDateInUSEastern(date) {
+  const usDate = new Date(date.toLocaleString("en-US", {timeZone: "America/New_York"}));
+
+  const options = { year: 'numeric', month: 'long', day: '2-digit' };
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+
+  return formatter.format(usDate);
+}
+
+function replaceDateInTemplate(content) {
+  if (!content.includes("${Month} ${Date}, ${year}")) {
+      return content;
+  }
+
+  const currentDate = new Date();
+  const formattedDate = formatDateInUSEastern(currentDate);
+  return content.replace("${Month} ${Date}, ${year}", formattedDate);
 }

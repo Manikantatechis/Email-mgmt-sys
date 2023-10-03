@@ -1,7 +1,4 @@
-
 // chart options
-
-
 
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,7 +23,7 @@ const barChartOptions = {
     enabled: false
   },
   xaxis: {
-    categories: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+    categories: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     axisBorder: {
       show: false
     },
@@ -42,28 +39,37 @@ const barChartOptions = {
   }
 };
 
-
-
-
-const MonthlyBarChart = () => {
+const MonthlyBarChart = ({ refresh, setRefresh }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  
-  const smsData = useSelector(state => state.reports.smsData);  // Using a selector just like in the IncomeAreaChart
+
+  const smsData = useSelector((state) => state.reports.smsData); // Using a selector just like in the IncomeAreaChart
 
   const [options, setOptions] = useState(barChartOptions);
   const [series, setSeries] = useState([{ name: 'SMS Count', data: smsData }]);
 
   useEffect(() => {
-    if (smsData && smsData.length > 0) {
+
+    if (refresh) {
+      dispatch(getSMSReport()).then((action) => {
+        if (getSMSReport.fulfilled.match(action)) {
+          const response = action.payload.report;
+          if (response) {
+            setSeries([{ name: 'SMS Count', data: response }]);
+          }
+        }
+      });
+      setRefresh(false);
+    }
+    else if (smsData && smsData.length > 0) {
       setSeries([{ name: 'SMS Count', data: smsData }]);
     } else {
       const localStorageData = JSON.parse(localStorage.getItem('smsData'));
 
       if (localStorageData) {
         setSeries([{ name: 'SMS Count', data: localStorageData }]);
-      } else {
-        dispatch(getSMSReport()).then(action => {
+      }  else {
+        dispatch(getSMSReport()).then((action) => {
           if (getSMSReport.fulfilled.match(action)) {
             const response = action.payload.report;
             if (response) {
@@ -73,10 +79,10 @@ const MonthlyBarChart = () => {
         });
       }
     }
-  }, [dispatch, smsData]);
+  }, [dispatch, smsData, refresh]);
 
   useEffect(() => {
-    const {secondary } = theme.palette.text;
+    const { secondary } = theme.palette.text;
     const info = theme.palette.info.light;
 
     setOptions((prevState) => ({
@@ -97,10 +103,9 @@ const MonthlyBarChart = () => {
 
   return (
     <div id="chart">
-      <ReactApexChart options={options} series={series} type="bar" height={365} />
+      <ReactApexChart options={options} series={series} type="bar" height={415} width={"100%"} />
     </div>
   );
 };
 
 export default MonthlyBarChart;
-

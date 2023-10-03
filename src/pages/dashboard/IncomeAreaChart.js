@@ -32,7 +32,7 @@ const areaChartOptions = {
   }
 };
 
-const IncomeAreaChart = ({ slot }) => {
+const IncomeAreaChart = ({ slot, refresh, setRefresh }) => {
   const theme = useTheme();
 
   const { primary, secondary } = theme.palette.text;
@@ -41,76 +41,89 @@ const IncomeAreaChart = ({ slot }) => {
   const [options, setOptions] = useState(areaChartOptions);
   const [series, setSeries] = useState([]);
 
+  const dispatch = useDispatch();
 
-
-  const dispatch = useDispatch()
-
-
-  const dataForSlot = useSelector(
-    slot === "month" ? selectMonthlyEmailReport : selectWeeklyEmailReport
-  );
-
-
+  const dataForSlot = useSelector(slot === 'month' ? selectMonthlyEmailReport : selectWeeklyEmailReport);
 
   useEffect(() => {
-    console.log(dataForSlot)
-    console.log(dataForSlot && Object.keys(dataForSlot).length === 0)
-    if (dataForSlot && Object.keys(dataForSlot).length === 0) {
+    console.log(dataForSlot);
+    console.log(dataForSlot && Object.keys(dataForSlot).length === 0);
+    if (refresh) {
+      dispatch(getEmailReport(slot)).then((action) => {
+        // Checking if the action was fulfilled
+        if (getEmailReport.fulfilled.match(action)) {
+          const response = action.payload.report;
+          if (response?.emailSent && response?.emailOpened) {
+            setSeries([
+              {
+                name: 'Emails Sent',
+                data: response.emailSent
+              },
+              {
+                name: 'Emails Opened',
+                data: response.emailOpened
+              }
+            ]);
+          }
+        }
+      });
+      setRefresh(false);
+    } else if (dataForSlot && Object.keys(dataForSlot).length === 0) {
       const localStorageData = JSON.parse(localStorage.getItem(slot));
 
       if (localStorageData && localStorageData.emailSent && localStorageData.emailOpened) {
         setSeries([
           {
-            name: "Emails Sent",
-            data: localStorageData.emailSent ,
+            name: 'Emails Sent',
+            data: localStorageData.emailSent
           },
           {
-            name: "Emails Opened",
-            data: localStorageData.emailOpened,
-          },
+            name: 'Emails Opened',
+            data: localStorageData.emailOpened
+          }
         ]);
       } else {
-        dispatch(getEmailReport(slot)).then(action => {
+        dispatch(getEmailReport(slot)).then((action) => {
           // Checking if the action was fulfilled
           if (getEmailReport.fulfilled.match(action)) {
             const response = action.payload.report;
             if (response?.emailSent && response?.emailOpened) {
               setSeries([
                 {
-                  name: "Emails Sent",
-                  data: response.emailSent,
+                  name: 'Emails Sent',
+                  data: response.emailSent
                 },
                 {
-                  name: "Emails Opened",
-                  data: response.emailOpened,
-                },
+                  name: 'Emails Opened',
+                  data: response.emailOpened
+                }
               ]);
             }
           }
         });
-        }
       }
-    else{
+    } else {
       setSeries([
         {
-          name: "Emails Sent",
-          data: dataForSlot.emailSent,
+          name: 'Emails Sent',
+          data: dataForSlot.emailSent
         },
         {
-          name: "Emails Opened",
-          data: dataForSlot.emailOpened,
-        },
+          name: 'Emails Opened',
+          data: dataForSlot.emailOpened
+        }
       ]);
     }
-  }, [slot, dispatch, dataForSlot]);
-  
+  }, [slot, dispatch, dataForSlot, refresh]);
+
   useEffect(() => {
     setOptions((prevState) => ({
       ...prevState,
       colors: [theme.palette.primary.main, theme.palette.primary[700]],
       xaxis: {
-        categories: slot === 'month' 
-            ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] 
+        categories:
+          slot === 'month'
+            ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
             : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         labels: {
           style: {
@@ -137,11 +150,7 @@ const IncomeAreaChart = ({ slot }) => {
         theme: 'light'
       }
     }));
-
   }, [primary, secondary, line, theme, slot]);
-
-
-
 
   return <ReactApexChart options={options} series={series} type="area" height={450} />;
 };

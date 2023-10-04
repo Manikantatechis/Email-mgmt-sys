@@ -46,8 +46,8 @@ async function sendSms(kixieCredentials, kixieTemplate, tableData, batchId,  use
     const batch = new kixieBatch({
       _id: batchId, 
       userId: userId,
-      kixieCredentialId: kixieCredentials._id,  // Assuming kixieCredentials object has an _id
-      kixieTemplateId: kixieTemplate._id,  // Assuming kixieTemplate object has an _id
+      kixieCredentialId: kixieCredentials._id,  
+      kixieTemplateId: kixieTemplate._id,  
       smsCount: successfulSms.length
     });
 

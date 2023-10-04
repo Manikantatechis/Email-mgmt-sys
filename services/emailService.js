@@ -16,11 +16,6 @@ function generateEmail(
   const encryptedTrackingData = encrypt(trackingData);
   console.log(`http://localhost:5183/api/track?data=${encryptedTrackingData}`)
   const trackingPixel = `<img src="${process.env.BACKEND_URL}/api/track?data=${encryptedTrackingData}" width="1" height="1" alt="" crossorigin="anonymous"/>`;
-
-  // console.log(
-  //   `${process.env.BACKEND_URL}/api/track?data=${encryptedTrackingData}`
-  // );
-
   const subject = gmailTemplate.subject;
   let emailBody;
   let rawEmailBody;
@@ -57,6 +52,13 @@ function generateEmail(
 }
 
 async function sendIndividualEmail(transporter, mailOptions) {
+  if(!mailOptions.to){
+    return {
+      to: mailOptions.to,
+      status: "Failed",
+      reason: "Invalid email id",
+    };
+  }
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
       await transporter.sendMail(mailOptions);
@@ -110,7 +112,7 @@ async function sendEmail(
       result.status === "fulfilled" && result.value.status === "Success"
   ).length;
 
-  const res = await saveBatch(batchId, userId, successfulEmails, gmailCredentials._id, gmailTemplate._id);
+  await saveBatch(batchId, userId, successfulEmails, gmailCredentials._id, gmailTemplate._id);
   // console.log(res)
   return emailResults;
 }
@@ -124,6 +126,9 @@ async function saveBatch(
   emailCredentialId,
   emailTemplateId
 ) {
+  if(emailCount === 0){
+    return "no emails sent"
+  }
   const newBatch = new EmailBatch({
     _id: batchId,
     userId,
@@ -137,8 +142,6 @@ async function saveBatch(
   if (!savedBatch) {
     throw new Error("Failed to save email batch");
   }
-
-  return savedBatch;
 }
 
 

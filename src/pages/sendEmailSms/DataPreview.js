@@ -10,9 +10,14 @@ import {
   Paper,
   TextareaAutosize,
   Container,
-  TextField,Box,Typography,
-  Grid, Modal
+  TextField,
+  Box,
+  Typography,
+  Grid,
+  Modal
 } from '@mui/material';
+import { CloseOutlined } from '@ant-design/icons';
+
 import Confirm from './confirm';
 import PreviewData from './summaryTable';
 
@@ -26,20 +31,25 @@ const tableReducer = (state, action) => {
       return newState;
     case 'ADD_ROW':
       return [...state, { Name: '', Phone: '', Email: '' }];
+    case 'DELETE_ROW':
+      return [...state.slice(0, action.rowIndex), ...state.slice(action.rowIndex + 1)];
 
     case 'CLEAR_DATA':
       return [];
+
     default:
       return state;
   }
 };
 
-const MemoTableRow = memo(({ row, rowIndex, handleCellChange }) => {
+const MemoTableRow = memo(({ row, rowIndex, handleCellChange, onDelete  }) => {
   const [localState, setLocalState] = useState(row);
 
   useEffect(() => {
     setLocalState(row);
   }, [row]);
+
+
 
   const handleBlur = (e, rowIndex, column) => {
     handleCellChange(e, rowIndex, column);
@@ -65,6 +75,9 @@ const MemoTableRow = memo(({ row, rowIndex, handleCellChange }) => {
           />
         </TableCell>
       ))}
+      <TableCell>
+        <CloseOutlined onClick={ ()=>onDelete(rowIndex)} style={{ cursor: 'pointer' }} />
+      </TableCell>
     </TableRow>
   );
 });
@@ -152,69 +165,76 @@ const DataPreview = () => {
     });
   }, []);
 
+  const deleteRow = (index) => {
+    dispatch({ type: 'DELETE_ROW', rowIndex: index });
+};
+
+
   const addRow = () => {
     dispatch({ type: 'ADD_ROW' });
   };
   return (
     <Container>
-      <Button variant="contained" onClick={handleModal} style={{ margin: '10px', position:"absolute", top:"0", marginTop:"12vh", right:20,  }}>
+      <Button
+        variant="contained"
+        onClick={handleModal}
+        style={{ margin: '10px', position: 'absolute', top: '0', marginTop: '12vh', right: 20 }}
+      >
         Instructions
       </Button>
-      <Modal
-    open={open}
-    onClose={handleModal}
-    aria-labelledby="instruction-modal-title"
-    aria-describedby="instruction-modal-description"
->
-    <Box 
-        sx={{ 
-            position: 'absolute', 
-            top: '50%', 
-            left: '50%', 
+      <Modal open={open} onClose={handleModal} aria-labelledby="instruction-modal-title" aria-describedby="instruction-modal-description">
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
             transform: 'translate(-50%, -50%)',
             maxWidth: '80%',
             width: '500px',
-            bgcolor: 'background.paper', 
-            boxShadow: 24, 
+            bgcolor: 'background.paper',
+            boxShadow: 24,
             p: 4,
             borderRadius: '10px'
-        }}
-    >
-        <Typography 
-            id="instruction-modal-title" 
-            variant="h6" 
-            component="h2" 
+          }}
+        >
+          <Typography
+            id="instruction-modal-title"
+            variant="h6"
+            component="h2"
             sx={{ borderBottom: '2px solid #f3f3f3', paddingBottom: '16px', marginBottom: '16px' }}
-        >
+          >
             Instructions for Pasting Data
-        </Typography>
-        <Typography 
-            id="instruction-modal-description" 
-            sx={{ mt: 2, fontSize: '0.9rem' }}
-        >
-            1. Begin by copying the desired data from the CRM website and paste it into a Google Sheet.<br />
-            2. Ensure that the first row of your Google Sheet contains the headers: {"Name"}, {"Phone"}, and {"Email"}. The data will be parsed based on these headers.<br />
-            3. After populating the Google Sheet, copy it again and paste it into the provided textarea on this site.<br />
-            4. Please avoid copying and pasting data directly from the CRM website to this tool.<br />
-            5. Choose your preferred sending method: SMS, Email, or both according to your needs.<br />
+          </Typography>
+          <Typography id="instruction-modal-description" sx={{ mt: 2, fontSize: '0.9rem' }}>
+            1. Begin by copying the desired data from the CRM website and paste it into a Google Sheet.
+            <br />
+            2. Ensure that the first row of your Google Sheet contains the headers: {'Name'}, {'Phone'}, and {'Email'}. The data will be
+            parsed based on these headers.
+            <br />
+            3. After populating the Google Sheet, copy it again and paste it into the provided textarea on this site.
+            <br />
+            4. Please avoid copying and pasting data directly from the CRM website to this tool.
+            <br />
+            5. Choose your preferred sending method: SMS, Email, or both according to your needs.
+            <br />
             6. Kindly note that the system can process up to 100 SMS and 100 emails at once.
-        </Typography>
-        <Button 
-            sx={{ 
-                mt: 2, 
-                backgroundColor: '#3f51b5', 
-                color: 'white',
-                '&:hover': {
-                    backgroundColor: '#303f9f'
-                }
-            }} 
-            variant="contained" 
+          </Typography>
+          <Button
+            sx={{
+              mt: 2,
+              backgroundColor: '#3f51b5',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#303f9f'
+              }
+            }}
+            variant="contained"
             onClick={handleModal}
-        >
+          >
             Got it!
-        </Button>
-    </Box>
-</Modal>
+          </Button>
+        </Box>
+      </Modal>
 
       <TextareaAutosize
         placeholder="Paste your Excel data here"
@@ -233,11 +253,12 @@ const DataPreview = () => {
               <TableCell style={{ fontWeight: 'bold' }}>Name</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Phone</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Email</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {tableData.map((row, rowIndex) => (
-              <MemoTableRow row={row} key={rowIndex} rowIndex={rowIndex} handleCellChange={handleCellChange} />
+              <MemoTableRow row={row} key={rowIndex} rowIndex={rowIndex} onDelete={deleteRow}  handleCellChange={handleCellChange} />
             ))}
           </TableBody>
         </Table>

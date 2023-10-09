@@ -85,14 +85,21 @@ function allowAnyOriginForTrackRoute(req, res, next) {
 
 app.use("/api/track", allowAnyOriginForTrackRoute);
 
+
 app.use("/api/users", userRoutes);
 app.use("/api/kixie-credentials", kixieCredentialsRoutes);
 app.use("/api/gmail-credentials", gmailCredentialsRoutes);
 app.use("/api/gmail-template", gmailTemplateRoutes);
 app.use("/api/kixie-template", kixieTemplateRoutes);
 app.use("/api/message", sendSmsRoutes);
-app.use("/api/track", trackRoute);
 app.use("/reports", reportRoutes)
+
+
+
+
+app.enable('trust proxy');
+app.use("/api/track", trackRoute);
+
 
 const PORT = process.env.PORT || 8000;
 

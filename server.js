@@ -60,12 +60,26 @@ app.use(
 );
 
 function allowAnyOriginForTrackRoute(req, res, next) {
+
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
   );
+  const clientIP = req.connection.remoteAddress;
+
+  // To ensure it's an IPv4 address, you can use regular expressions
+  const ipv4Pattern = /\d+\.\d+\.\d+\.\d+/;
+  const ipv4Match = clientIP.match(ipv4Pattern);
+  if (ipv4Match) {
+    // Store the IPv4 address in the request object for later use
+    req.clientIPv4 = ipv4Match[0];
+  } else {
+    // Handle cases where the address is not IPv4
+    req.clientIPv4 = null;
+  }
+
   next();
 }
 

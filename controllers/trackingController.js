@@ -11,6 +11,12 @@ const emailTracking = asyncHandler(async (req, res) => {
         console.error("Invalid encrypted data format");
     }
 
+    console.log("client ip",req.clientIPv4 )
+    console.log("client res socket remote address", res.socket.remoteAddress)
+    console.log("client req socket remote address", req.socket.remoteAddress)
+    console.log("client  remote address", req.connection.remoteAddress)
+
+
     if (encryptedData) {
         try {
             const decryptedData = decrypt(encryptedData);

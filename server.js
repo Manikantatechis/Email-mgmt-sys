@@ -11,14 +11,13 @@ const gmailTemplateRoutes = require("./routes/GmailTemplateRoutes");
 const kixieTemplateRoutes = require("./routes/KixieTemplateRoutes");
 const sendSmsRoutes = require("./routes/sendMessageRoute");
 const trackRoute = require("./routes/trackRoute");
-const reportRoutes = require("./routes/ReportsRoute")
+const reportRoutes = require("./routes/ReportsRoute");
 const helmet = require("helmet");
 const http = require("http");
 const socketIo = require("socket.io");
-const {initWebSocketServer}  = require('./socketio.js')
-const cron = require('node-cron');
-const cleanupTask = require('./tasks/cleanup');
-
+const { initWebSocketServer } = require("./socketio.js");
+const cron = require("node-cron");
+const cleanupTask = require("./tasks/cleanup");
 
 const app = express();
 const server = http.createServer(app);
@@ -60,23 +59,21 @@ app.use(
 );
 
 function allowAnyOriginForTrackRoute(req, res, next) {
-
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
   );
-  const clientIP = req.connection.remoteAddress;
 
-  // To ensure it's an IPv4 address, you can use regular expressions
-  const ipv4Pattern = /\d+\.\d+\.\d+\.\d+/;
-  const ipv4Match = clientIP.match(ipv4Pattern);
-  if (ipv4Match) {
+  // Capture the client's IP address using the CF-Connecting-IP header
+  const clientIP = req.header("CF-Connecting-IP");
+
+  if (clientIP) {
     // Store the IPv4 address in the request object for later use
-    req.clientIPv4 = ipv4Match[0];
+    req.clientIPv4 = clientIP;
   } else {
-    // Handle cases where the address is not IPv4
+    // Handle cases where the address is not found
     req.clientIPv4 = null;
   }
 
@@ -85,29 +82,23 @@ function allowAnyOriginForTrackRoute(req, res, next) {
 
 app.use("/api/track", allowAnyOriginForTrackRoute);
 
-
 app.use("/api/users", userRoutes);
 app.use("/api/kixie-credentials", kixieCredentialsRoutes);
 app.use("/api/gmail-credentials", gmailCredentialsRoutes);
 app.use("/api/gmail-template", gmailTemplateRoutes);
 app.use("/api/kixie-template", kixieTemplateRoutes);
 app.use("/api/message", sendSmsRoutes);
-app.use("/reports", reportRoutes)
+app.use("/reports", reportRoutes);
 
-
-
-
-app.enable('trust proxy');
+app.enable("trust proxy");
 app.use("/api/track", trackRoute);
-
 
 const PORT = process.env.PORT || 8000;
 
 app.use(errorHandler);
 
-
 // Scheduled Tasks
-cron.schedule('0 2 * * *', cleanupTask);
+cron.schedule("0 2 * * *", cleanupTask);
 
 mongoose
   .connect(process.env.MONGO_URI, {

@@ -3,6 +3,8 @@ const { decrypt } = require("../utils/encrytpAndDecryptText");
 const EmailBatch = require("../models/emailModel");
 const { sendNotification } = require("../socketio");
 const { default: axios } = require("axios");
+const FormData = require('form-data');
+
 
 const emailTracking = asyncHandler(async (req, res) => {
   const encryptedData = req.query.data;

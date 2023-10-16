@@ -23,7 +23,7 @@ const barChartOptions = {
     enabled: false
   },
   xaxis: {
-    categories: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    categories: [  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     axisBorder: {
       show: false
     },

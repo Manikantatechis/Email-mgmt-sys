@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 // material-ui
 import { Box, Button, Grid, Stack, Typography } from '@mui/material';
 
@@ -8,12 +7,21 @@ import IncomeAreaChart from './IncomeAreaChart';
 import MonthlyBarChart from './MonthlyBarChart';
 import MainCard from 'components/MainCard';
 import AnalyticEcommerce from 'components/cards/statistics/AnalyticEcommerce';
+import { useSelector } from '../../../node_modules/react-redux/es/exports';
+import { selectTotalEmailsOpened, selectTotalEmailsSent, selectTotalSMSSent } from 'store/reports/reportsSlice';
 
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 const DashboardDefault = () => {
   const [slot, setSlot] = useState('week');
-  const [refresh, setRefresh] = useState(false)
+  const [refresh, setRefresh] = useState(false);
+
+  const totalEmailsSent = useSelector(selectTotalEmailsSent) || localStorage.getItem('totalEmailsSent');
+  const totalEmailsOpened = useSelector(selectTotalEmailsOpened) || localStorage.getItem('totalEmailsOpened');
+  const totalSMSSent = useSelector(selectTotalSMSSent) || localStorage.getItem('totalSMSSent');
+
+  const percentage = (totalEmailsOpened/totalEmailsSent*100).toFixed(2)
+
 
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
@@ -27,15 +35,15 @@ const DashboardDefault = () => {
         <Typography variant="h5">Dashboard</Typography>
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Total Emails Sent" count="4236" />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Total SMS Sent" count="6250" />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Total Emails Opened" count="3800" percentage={27.4} isLoss color="warning" />
+        <AnalyticEcommerce title="Total Emails Sent" count={totalEmailsSent || 0} />
       </Grid>
 
+      <Grid item xs={12} sm={6} md={4} lg={3}>
+        <AnalyticEcommerce title="Total Emails Opened" count={totalEmailsOpened || 0} percentage={percentage || 0} color="warning" />
+      </Grid>
+      <Grid item xs={12} sm={6} md={4} lg={3}>
+        <AnalyticEcommerce title="Total SMS Sent" count={totalSMSSent || 0} />
+      </Grid>
       <Grid item md={8} sx={{ display: { sm: 'none', md: 'block', lg: 'none' } }} />
 
       {/* row 2 */}
@@ -67,7 +75,7 @@ const DashboardDefault = () => {
         </Grid>
         <MainCard content={false} sx={{ mt: 1.5 }}>
           <Box sx={{ pt: 1, pr: 2 }}>
-            <IncomeAreaChart slot={slot} refresh = {refresh} setRefresh = {setRefresh}/>
+            <IncomeAreaChart slot={slot} refresh={refresh} setRefresh={setRefresh} />
           </Box>
         </MainCard>
       </Grid>
@@ -86,7 +94,7 @@ const DashboardDefault = () => {
               </Typography>
             </Stack>
           </Box>
-          <MonthlyBarChart refresh = {refresh} setRefresh = {setRefresh} />
+          <MonthlyBarChart refresh={refresh} setRefresh={setRefresh} />
         </MainCard>
       </Grid>
     </Grid>

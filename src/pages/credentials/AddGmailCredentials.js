@@ -48,6 +48,8 @@ const AddGmailCredentials = ({ setIsGmailCredentialsOpen, role }) => {
         alignItems: 'center',
         justifyContent: 'center'
       }}
+      maxWidth={false}
+      
     >
       <Paper elevation={3} sx={{ padding: 4, maxWidth: '500px', width: '90%' }}>
         <Formik
@@ -76,6 +78,7 @@ const AddGmailCredentials = ({ setIsGmailCredentialsOpen, role }) => {
                   <InputLabel htmlFor="email">Email</InputLabel>
                   <OutlinedInput
                     sx={{ width: '100%' }}
+
                     id="email"
                     name="email"
                     value={values.email}

@@ -52,6 +52,8 @@ const AddKixieCredentials = ({ setIsKixieCredentialsOpen, role }) => {
         alignItems: 'center',
         justifyContent: 'center'
       }}
+      maxWidth={false}
+
     >
       <Paper elevation={3} sx={{ padding: 4, maxWidth: '500px', width: '90%' }}>
         <Formik

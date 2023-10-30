@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Grid, InputLabel, FormControl, Button, Stack, Select, MenuItem, Container, CircularProgress } from '@mui/material';
 import { getGmailTemplatesNames, getKixieTemplatesNames } from 'services/templateService';
@@ -20,7 +19,9 @@ const Dropdown = ({ label, id, value, onChange, options, isLoading }) => (
               <CircularProgress size={20} />
             </MenuItem>
           ) : (
-            options&& options.length > 0 &&   options?.map(({ _id,name, subject, email }) => (
+            options &&
+            options.length > 0 &&
+            options?.map(({ _id, name, subject, email }) => (
               <MenuItem value={_id} key={_id}>
                 {name || subject || email}
               </MenuItem>
@@ -82,7 +83,7 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
 
   const handleSend = async () => {
     const actionData = {};
-    setIsSendLoading(true)
+    setIsSendLoading(true);
 
     if (actionType === SMS || actionType === BOTH) {
       actionData.kixieCredId = kixieNo;
@@ -97,11 +98,11 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
     try {
       const res = await sendMessage({ actionData, tableData, actionType });
 
-      setResData(res)
+      setResData(res);
       // console.log(res)
-      setIsSendLoading(false)
+      setIsSendLoading(false);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
 
     // Clear the selected values if needed
@@ -110,13 +111,13 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
     setMailId('');
     setKixieNo('');
     setActionType(false);
-    setIsSendLoading(false)
+    setIsSendLoading(false);
   };
 
   return (
     <Container
       style={{
-        width: '500vh',
+        width: '100vw',
         position: 'fixed',
         height: '100vh',
         top: '0',
@@ -124,6 +125,7 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
         background: '#09090957',
         overflow: 'hidden'
       }}
+      maxWidth={false}
     >
       <Grid
         container
@@ -180,9 +182,9 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
           </>
         ) : null}
         <Grid item xs={12}>
-        <Button variant="contained" color="primary" onClick={handleSend} fullWidth disabled={loadingSend}>
-  {loadingSend ? <CircularProgress size={24} color="inherit" /> : 'Send'}
-</Button>
+          <Button variant="contained" color="primary" onClick={handleSend} fullWidth disabled={loadingSend}>
+            {loadingSend ? <CircularProgress size={24} color="inherit" /> : 'Send'}
+          </Button>
 
           <Button variant="contained" color="secondary" onClick={handleCancel} fullWidth style={{ marginTop: '10px' }}>
             Cancel

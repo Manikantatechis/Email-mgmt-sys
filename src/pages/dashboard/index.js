@@ -25,7 +25,7 @@ const DashboardDefault = () => {
 
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
-      <Stack direction="row" alignItems="center" spacing={0} sx={{ position: 'fixed', top: '8vh', right: '5vw' }}>
+      <Stack direction="row" alignItems="center" spacing={0} sx={{ position: 'fixed', top: '15vh', right: '5vw' }}>
         <Button size="medium" onClick={() => setRefresh(true)} color="primary" variant="contained">
           Refresh
         </Button>

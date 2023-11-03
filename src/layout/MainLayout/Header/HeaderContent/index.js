@@ -1,11 +1,10 @@
 // material-ui
-import { Box, IconButton, Link, useMediaQuery, Typography } from '@mui/material';
-import { GithubOutlined } from '@ant-design/icons';
+import { Box,useMediaQuery, Typography } from '@mui/material';
 
-// project import
-// import Search from './Search';
 import Profile from './Profile';
 import Notification from './Notification';
+import TimeZoneClock from './TimeZoneClock';
+
 
 // ==============================|| HEADER - CONTENT ||============================== //
 
@@ -14,7 +13,10 @@ const HeaderContent = () => {
 
   return (
     <>
-      <Box sx={{ width: '100%', ml: { xs: 0, md: 1 } }}>
+    <Box sx={{display:"flex", justifyContent:"space-between", width:"100%", alignItems:"center"}}>
+
+  
+      <Box sx={{ width: 'fit-content', ml: { xs: 0, md: 1 },  }}>
         <Typography
           variant="h1"
           component="h2"
@@ -30,23 +32,21 @@ const HeaderContent = () => {
           Tech IS Customer Outreach
         </Typography>
       </Box>
+      <Box>
+
+      {!matchesXs && <TimeZoneClock />}
 
       {matchesXs && <Box sx={{ width: '100%', ml: 1 }} />}
+      </Box>
 
-      <IconButton
-        component={Link}
-        href="https://github.com/manikantatechis"
-        target="_blank"
-        disableRipple
-        color="secondary"
-        title="EMS"
-        sx={{ color: 'text.primary', bgcolor: 'grey.100' }}
-      >
-        <GithubOutlined />
-      </IconButton>
-
-      <Notification />
+<Box sx={{display:"flex", alignItems:"center"}}>
+        <Notification />
       <Profile />
+</Box>
+     
+
+
+      </Box>
     </>
   );
 };

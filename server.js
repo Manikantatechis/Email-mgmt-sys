@@ -18,6 +18,8 @@ const socketIo = require("socket.io");
 const { initWebSocketServer } = require("./socketio.js");
 const cron = require("node-cron");
 const cleanupTask = require("./tasks/cleanup");
+const { sendQueue } = require('./tasks/scheduler');
+const ScheduledTask = require("./models/scheduledTaskModel.js")
 
 const app = express();
 const server = http.createServer(app);
@@ -104,6 +106,20 @@ mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+  }).then(async()=>{
+    const pendingTasks = await ScheduledTask.find({ status: 'pending' });
+  for (let task of pendingTasks) {
+    console.log("first")
+    if (task.scheduledTime > new Date()) {
+      sendQueue.add(
+        { taskId: task._id },
+        { delay: task.scheduledTime - Date.now() }
+      );
+    } else {
+      sendQueue.add({ taskId: task._id });
+    }
+  }
+
   })
   .then(() => {
     server.listen(PORT, () =>

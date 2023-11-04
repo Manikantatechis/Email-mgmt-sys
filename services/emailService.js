@@ -5,119 +5,95 @@ const EmailBatch = require("../models/emailModel");
 
 const MAX_RETRIES = 3; // Number of times to retry sending
 const RETRY_DELAY = 5000; // Delay between retries in milliseconds (5 seconds)
+const DELAY_BETWEEN_EMAILS = 1000; // Delay between sending individual emails (1 second)
+const BACKEND_URL = process.env.BACKEND_URL; // Read once and use everywhere
 
-function generateEmail(
-  { Name, Email },
-  gmailCredentials,
-  gmailTemplate,
-  batchId
-) {
-  const trackingData = JSON.stringify({ batchId, Email, Name });
-  const encryptedTrackingData = encrypt(trackingData);
-  console.log(`http://localhost:5183/api/track?data=${encryptedTrackingData}`)
-  const trackingPixel = `<img src="${process.env.BACKEND_URL}/api/track?data=${encryptedTrackingData}" width="1" height="1" alt="" crossorigin="anonymous"/>`;
-  const subject = gmailTemplate.subject;
-  let emailBody;
-  let rawEmailBody;
-  if (gmailTemplate.type === "html") {
-      rawEmailBody = (gmailTemplate.html || "");
-  } else {
-      rawEmailBody = (gmailTemplate.content || "");
-  }
-  
-  // Replace name and date in the content
-  emailBody = replaceDateInTemplate(rawEmailBody.replace(/\$\{name\}/g, Name)) + trackingPixel;
+// Create a single transporter object using the default SMTP transport
+const createTransporter = (gmailCredentials)=>{
 
-  const mailOptions = {
-    from: gmailCredentials.email,
-    to: Email,
-    subject,
-  };
-
-  if (gmailTemplate.type === "html") {
-    mailOptions.html = emailBody;
-  } else {
-    mailOptions.html = emailBody;
-  }
-
-  if (gmailTemplate.cc && gmailTemplate.cc.length > 0) {
-    mailOptions.cc = gmailTemplate.cc.join(", ");
-  }
-
-  if (gmailTemplate.bcc && gmailTemplate.bcc.length > 0) {
-    mailOptions.bcc = gmailTemplate.bcc.join(", ");
-  }
-
-  return mailOptions;
+return  nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    type: "OAuth2",
+    user: gmailCredentials.email,
+    clientId: gmailCredentials.oauthClientId,
+    clientSecret: gmailCredentials.oauthClientSecret,
+    refreshToken: gmailCredentials.oauthRefreshToken,
+  },
+});
 }
 
-async function sendIndividualEmail(transporter, mailOptions) {
-  if(!mailOptions.to){
+function isValidEmail(email) {
+  // Placeholder for email validation logic
+  // Replace this with your actual email validation
+  return email && /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
+}
+
+async function sendIndividualEmail(transporter, mailOptions, attempt = 1) {
+  if (!isValidEmail(mailOptions.to)) {
+    console.log(`Invalid email: ${mailOptions.to}`);
     return {
-      to: mailOptions.to,
+      Name: mailOptions.name,
+      Email: mailOptions.to,
       status: "Failed",
       reason: "Invalid email id",
     };
   }
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    try {
-      await transporter.sendMail(mailOptions);
-      return { to: mailOptions.to, status: "Success" };
-    } catch (error) {
-      console.error(`Email Error (Attempt ${attempt + 1}):`, error);
-      if (attempt < MAX_RETRIES - 1) {
-        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
-      }
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Email sent to ${mailOptions.to}`);
+    return { Name: mailOptions.name, Email: mailOptions.to, status: "Success" };
+  } catch (error) {
+    console.error(`Attempt ${attempt} failed:`, error);
+    if (attempt >= MAX_RETRIES) {
+      return {
+        Name: mailOptions.name,
+        Email: mailOptions.to,
+        status: "Failed",
+        reason: "Max retries reached",
+      };
     }
+    await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+    return sendIndividualEmail(transporter, mailOptions, attempt + 1);
   }
-  return {
-    to: mailOptions.to,
-    status: "Failed",
-    reason: "Max retries reached.",
-  };
 }
 
-async function sendEmail(
-  gmailCredentials,
-  gmailTemplate,
-  tableData,
-  batchId,
-  userId
-) {
-  let transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      type: "OAuth2",
-      user: gmailCredentials.email,
-      clientId: gmailCredentials.oauthClientId,
-      clientSecret: gmailCredentials.oauthClientSecret,
-      refreshToken: gmailCredentials.oauthRefreshToken,
-    },
-  });
+async function sendEmail(gmailCredentials, gmailTemplate, tableData, batchId, userId) {
+  let successfulEmailsCount = 0;
+  let successfulEmails = [];
+  let failedEmails = [];
+  let transporter = createTransporter(gmailCredentials)
 
-  const emailPromises = tableData.map((data) => {
+  for (const data of tableData) {
     const mailOptions = generateEmail(
       data,
       gmailCredentials,
       gmailTemplate,
       batchId
     );
-    return sendIndividualEmail(transporter, mailOptions);
-  });
+    const result = await sendIndividualEmail(transporter, mailOptions);
+    if (result.status === "Success") {
+      successfulEmailsCount++;
+      successfulEmails.push(result);
+    } else {
+      failedEmails.push(result);
+    }
+    await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_EMAILS));
+  }
 
-  const emailResults = await Promise.allSettled(emailPromises);
+  const batchResult = await saveBatch(
+    batchId,
+    userId,
+    successfulEmailsCount,
+    gmailCredentials._id,
+    gmailTemplate._id
+  );
+  console.log(`Emails sent successfully: ${successfulEmailsCount}`);
+  console.log(`Failed emails: ${failedEmails.length}`);
 
-  const successfulEmails = emailResults.filter(
-    (result) =>
-      result.status === "fulfilled" && result.value.status === "Success"
-  ).length;
-
-  await saveBatch(batchId, userId, successfulEmails, gmailCredentials._id, gmailTemplate._id);
-  // console.log(res)
-  return emailResults;
+  return { successfulEmailsCount, successfulEmails, failedEmails, batchResult };
 }
-
-module.exports = sendEmail;
 
 async function saveBatch(
   batchId,
@@ -145,22 +121,45 @@ async function saveBatch(
 }
 
 
+function generateEmail(
+  { Name, Email },
+  gmailCredentials,
+  gmailTemplate,
+  batchId
+) {
+  const trackingData = JSON.stringify({ batchId, Email, Name });
+  const encryptedTrackingData = encrypt(trackingData);
+  const trackingPixel = `<img src="${BACKEND_URL}/api/track?data=${encryptedTrackingData}" width="1" height="1" alt="" crossorigin="anonymous"/>`;
+  const subject = gmailTemplate.subject;
+  const rawEmailBody =
+    gmailTemplate.type === "html" ? gmailTemplate.html : gmailTemplate.content;
+  const emailBody =
+    replaceDateInTemplate(rawEmailBody.replace(/\$\{name\}/g, Name)) +
+    trackingPixel;
 
-function formatDateInUSEastern(date) {
-  const usDate = new Date(date.toLocaleString("en-US", {timeZone: "America/New_York"}));
-
-  const options = { year: 'numeric', month: 'long', day: '2-digit' };
-  const formatter = new Intl.DateTimeFormat('en-US', options);
-
-  return formatter.format(usDate);
+  const mailOptions = {
+    from: gmailCredentials.email,
+    to: Email,
+    subject,
+    html: emailBody, // You can set plain text as well with `text` field
+    cc: gmailTemplate.cc?.join(", "),
+    bcc: gmailTemplate.bcc?.join(", "),
+    name: Name,
+  };
+  return mailOptions;
 }
 
 function replaceDateInTemplate(content) {
-  if (!content.includes("${Month} ${Date}, ${year}")) {
-      return content;
-  }
-
-  const currentDate = new Date();
-  const formattedDate = formatDateInUSEastern(currentDate);
-  return content.replace("${Month} ${Date}, ${year}", formattedDate);
+  const formattedDate = formatDateInUSEastern(new Date());
+  return content.replace(/\$\{Month\} \$\{Date\}, \$\{year\}/g, formattedDate);
 }
+
+function formatDateInUSEastern(date) {
+  const usDate = new Date(
+    date.toLocaleString("en-US", { timeZone: "America/New_York" })
+  );
+  const options = { year: "numeric", month: "long", day: "2-digit" };
+  return new Intl.DateTimeFormat("en-US", options).format(usDate);
+}
+
+module.exports = sendEmail;

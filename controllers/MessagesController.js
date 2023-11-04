@@ -3,6 +3,7 @@ const sendSms = require("../services/smsService"); // service to handle sending 
 const sendEmail = require("../services/emailService"); // service to handle sending Email
 const asyncHandler = require("express-async-handler");
 const crypto = require("crypto");
+const { sendQueue } = require("../tasks/scheduler");
 
 // Import your models
 const KixieCredentials = require("../models/kixieCredModel");
@@ -10,21 +11,21 @@ const KixieTemplate = require("../models/kixieTemplateModel");
 const GmailCredentials = require("../models/gmailCredModel");
 const GmailTemplate = require("../models/gmailTemplateModel");
 const EmailBatch = require("../models/emailModel");
+const ScheduledTask = require("../models/scheduledTaskModel");
 
-const sendMessages = asyncHandler(async (req, res) => {
-  const {
-    userId,
-    body: { actionType, actionData, tableData },
-  } = req;
-
+const sendMessagesService = async (
+  userId,
+  actionType,
+  actionData,
+  tableData
+) => {
   // Validate actionData based on actionType
   validateActionData(actionType, actionData);
 
   let smsSummary = [],
     emailSummary = [];
 
-    const batchId = generateBatchId(userId);
-
+  const batchId = generateBatchId(userId);
 
   if (actionType === "sms" || actionType === "both") {
     const kixieCredentials = await getDecryptedCredentials(
@@ -38,11 +39,16 @@ const sendMessages = asyncHandler(async (req, res) => {
       KixieTemplate,
       actionData.kixieTemplateId
     );
-    smsSummary = await sendSms(kixieCredentials, kixieTemplate, tableData, batchId,  userId);
+    smsSummary = await sendSms(
+      kixieCredentials,
+      kixieTemplate,
+      tableData,
+      batchId,
+      userId
+    );
   }
 
   if (actionType === "email" || actionType === "both") {
-
     const gmailCredentials = await getDecryptedCredentials(
       GmailCredentials,
       actionData.emailCredId
@@ -63,7 +69,6 @@ const sendMessages = asyncHandler(async (req, res) => {
       actionData.emailTemplateId
     );
 
-
     emailSummary = await sendEmail(
       gmailCredentials,
       gmailTemplate,
@@ -73,9 +78,46 @@ const sendMessages = asyncHandler(async (req, res) => {
     );
   }
 
-  const summary = {smsSummary, emailSummary };
-  res.status(200).json(summary);
+  const summary = { smsSummary, emailSummary };
+  return summary
+};
+
+
+const sendMessages = asyncHandler(async (req, res) => {
+  const {
+    userId,
+    body: { actionType, actionData, tableData, scheduledTime },
+  } = req;
+
+  if (scheduledTime && new Date(scheduledTime) > new Date()) {
+    const newTask = new ScheduledTask({
+      userId,
+      actionType,
+      actionData,
+      tableData,
+      scheduledTime,
+    });
+    await newTask.save();
+
+    sendQueue.add(
+      { taskId: newTask._id }, // Pass taskId to the queue
+      { delay: new Date(scheduledTime) - Date.now() }
+    );
+
+    res.status(200).json({ message: "Scheduled successfully!" });
+  } else {
+    const summary = await sendMessagesService(
+      userId,
+      actionType,
+      actionData,
+      tableData
+    );
+    res.status(200).json(summary);
+  }
 });
+
+
+
 
 // Function to generate batch id
 function generateBatchId(userId) {
@@ -86,7 +128,7 @@ function generateBatchId(userId) {
     .digest("hex");
 }
 
-// Function to save a new batch
+
 
 // Function to get decrypted credentials
 async function getDecryptedCredentials(Model, id) {
@@ -97,6 +139,8 @@ async function getDecryptedCredentials(Model, id) {
   return credentials; // Assume decryptData function will decrypt the necessary fields
 }
 
+
+
 // Function to get a template
 async function getTemplate(Model, id) {
   const template = await Model.findById(id);
@@ -105,6 +149,8 @@ async function getTemplate(Model, id) {
   }
   return template;
 }
+
+
 
 function validateActionData(actionType, actionData) {
   const { emailCredId, emailTemplateId, kixieCredId, kixieTemplateId } =
@@ -125,4 +171,6 @@ function validateActionData(actionType, actionData) {
   }
 }
 
-module.exports = { sendMessages };
+
+
+module.exports = { sendMessages, sendMessagesService };

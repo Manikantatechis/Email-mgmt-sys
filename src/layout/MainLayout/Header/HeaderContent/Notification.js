@@ -40,7 +40,6 @@ const Notification = () => {
   useEffect(() => {
     socket.current.on('notification', (data) => {
       const newNotification = data.data;
-      console.log("Hello", newNotification)
       // Update the state and the localStorage simultaneously
       setNotifications((prevNotifications) => {
         const updatedNotifications = [...prevNotifications, newNotification];

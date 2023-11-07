@@ -80,7 +80,6 @@ const UserListMap = ({ user, role }) => {
   const [editUser, setEditUser] = useState(user);
 
   const handleChange = (event) => {
-    console.log(event)
     const { name, value } = event.target;
     setEditUser(prevEditUser => ({ ...prevEditUser, [name]: value }));
   };

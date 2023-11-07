@@ -83,7 +83,6 @@ const handleCloseSnackbar = () => {
             if (res) {
               setStatus({ success: true });
             }
-            // console.log({ ...values });
             setSubmitting(false);
             resetForm();
             setOpenSnackbar(true);

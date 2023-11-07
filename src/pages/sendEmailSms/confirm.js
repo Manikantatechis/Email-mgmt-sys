@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, InputLabel, FormControl, Button, Stack, Select, MenuItem, Container, CircularProgress } from '@mui/material';
+import { TextField, Grid, InputLabel, FormControl, Button, Stack, Select, MenuItem, Container, CircularProgress, } from '@mui/material';
 import { getGmailTemplatesNames, getKixieTemplatesNames } from 'services/templateService';
 import { getGmailCredNames, getKixieCredNames } from 'services/credentialsService';
 import { sendMessage } from 'services/messageService';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+// or if you are using a different date library
+// import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
 
 const SMS = 'sms';
 const EMAIL = 'email';
@@ -46,6 +53,14 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
   });
 
   const [loading, setLoading] = useState(false);
+
+  // State for the DateTimePicker
+  const [selectedDateTime, setSelectedDateTime] = useState(new Date());
+
+  // Handler for the DateTimePicker change
+  const handleDateTimeChange = (newValue) => {
+    setSelectedDateTime(newValue);
+  };
 
   const fetchData = async () => {
     try {
@@ -94,12 +109,10 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
       actionData.emailCredId = mailId;
       actionData.emailTemplateId = emailTemplate;
     }
-    // console.log({ actionData, tableData, actionType });
     try {
       const res = await sendMessage({ actionData, tableData, actionType });
 
       setResData(res);
-      // console.log(res)
       setIsSendLoading(false);
     } catch (error) {
       console.log(error);
@@ -115,6 +128,7 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
   };
 
   return (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
     <Container
       style={{
         width: '100vw',
@@ -182,16 +196,41 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
           </>
         ) : null}
         <Grid item xs={12}>
-          <Button variant="contained" color="primary" onClick={handleSend} fullWidth disabled={loadingSend}>
+    <Stack spacing={1}>
+      <InputLabel >Select Date and Time</InputLabel>
+
+      
+        <DateTimePicker
+          // label="Select Date and Time"
+          value={selectedDateTime}
+          onChange={handleDateTimeChange}
+          renderInput={(params) => <TextField {...params} />}
+        />
+
+    </Stack>
+  </Grid>
+        <Grid item xs={12} sx={{display:"flex", gap:"10px"}}>
+          
+            <Button sx={{flex: 1, }}variant="contained" color="primary" onClick={handleSend} fullWidth disabled={loadingSend}>
             {loadingSend ? <CircularProgress size={24} color="inherit" /> : 'Send'}
           </Button>
+          
+          
+          
+         
+          <Button sx={{flex: 1}}variant="contained"  onClick={handleCancel} fullWidth style={{flex: 1, background:"rgb(76, 175, 80)"}}>
+            Schedule
+          </Button>
+          
 
-          <Button variant="contained" color="secondary" onClick={handleCancel} fullWidth style={{ marginTop: '10px' }}>
+          <Button sx={{flex: 1}}variant="contained"  onClick={handleCancel} fullWidth style={{ height:"fit-content", background:"rgb(243, 69, 69)"}}>
             Cancel
           </Button>
         </Grid>
+        
       </Grid>
     </Container>
+    </LocalizationProvider>
   );
 };
 

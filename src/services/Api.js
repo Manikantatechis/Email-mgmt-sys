@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL
-// console.log(API_URL)
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
@@ -15,7 +14,6 @@ export const handleRequest = async (method, url, data = {}) => {
   } catch (error) {
     const message =
       (error.message && error.response && error.response.data && error.response.data.message) || error.message || error.toString();
-    // console.log(message);
     throw new Error(message);
   }
 };

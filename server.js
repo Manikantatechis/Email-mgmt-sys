@@ -27,7 +27,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
   "http://127.0.0.1:5174",
   "http://localhost:3000",
-  "http://127.0.0.1:5173",
+  "http://127.0.0.1:3000",
   "http://localhost:3000",
   process.env.FRONTEND_URL,
   process.env.ADMIN_FRONTEND_URL,
@@ -100,7 +100,9 @@ const PORT = process.env.PORT || 8000;
 app.use(errorHandler);
 
 // Scheduled Tasks
-cron.schedule("0 2 * * *", cleanupTask);
+// console.log(new Date().toString())
+cron.schedule("41 11 * * *", cleanupTask);
+
 
 mongoose
   .connect(process.env.MONGO_URI, {

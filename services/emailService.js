@@ -31,7 +31,7 @@ function isValidEmail(email) {
 
 async function sendIndividualEmail(transporter, mailOptions, attempt = 1) {
   if (!isValidEmail(mailOptions.to)) {
-    console.log(`Invalid email: ${mailOptions.to}`);
+    // console.log(`Invalid email: ${mailOptions.to}`);
     return {
       Name: mailOptions.name,
       Email: mailOptions.to,
@@ -42,7 +42,7 @@ async function sendIndividualEmail(transporter, mailOptions, attempt = 1) {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`Email sent to ${mailOptions.to}`);
+    // console.log(`Email sent to ${mailOptions.to}`);
     return { Name: mailOptions.name, Email: mailOptions.to, status: "Success" };
   } catch (error) {
     console.error(`Attempt ${attempt} failed:`, error);
@@ -89,8 +89,8 @@ async function sendEmail(gmailCredentials, gmailTemplate, tableData, batchId, us
     gmailCredentials._id,
     gmailTemplate._id
   );
-  console.log(`Emails sent successfully: ${successfulEmailsCount}`);
-  console.log(`Failed emails: ${failedEmails.length}`);
+  // console.log(`Emails sent successfully: ${successfulEmailsCount}`);
+  // console.log(`Failed emails: ${failedEmails.length}`);
 
   return { successfulEmailsCount, successfulEmails, failedEmails, batchResult };
 }

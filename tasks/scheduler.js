@@ -1,6 +1,6 @@
 const Queue = require("bull");
 const ScheduledTask = require("../models/scheduledTaskModel");
-const { sendMessagesService } = require("../controllers/MessagesController");
+const sendMessagesService = require("../services/sendMessageService");
 // const { sendMessagesService } = require('./service');
 
 const sendQueue = new Queue('sendMessages', {
@@ -14,20 +14,24 @@ const sendQueue = new Queue('sendMessages', {
 });
 
 sendQueue.process(async (job) => {
-  const taskId = job.data.taskId;
-  const task = await ScheduledTask.findById(taskId);
+  try {
+    const taskId = job.data.taskId;
+    const task = await ScheduledTask.findById(taskId);
 
-  if (task && task.status === "pending") {
-    const { userId, actionType, actionData, tableData } = task;
-    console.log({task})
-    console.log("scheduled");
-    await sendMessagesService(userId, actionType, actionData, tableData);
-    await ScheduledTask.updateOne({ _id: taskId }, { status: "completed" });
+    if (task && task.status === "pending") {
+      const { userId, actionType, actionData, tableData } = task;
+      const summary = await sendMessagesService(userId, actionType, actionData, tableData);
+      console.log(summary);
+      await ScheduledTask.updateOne({ _id: taskId }, { status: "completed" });
+    }
+  } catch (error) {
+    console.error('Error processing task:', error);
   }
 });
 
+
 sendQueue.on('error', (error) => {
-  console.log(`Hey: ${error.message}`);
+  console.log(`Error: ${error.message}`);
 });
 
 

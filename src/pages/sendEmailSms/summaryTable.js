@@ -31,12 +31,13 @@ const SummaryTable = ({ summary, type }) => (
 
 const PreviewData = ({ resData, setResData }) => (
   <Container
+  maxWidth="lg"
     style={{
-      width: '80%',
       position: 'fixed',
-      height: '90vh',
-      top: '65px',
-      right: '0',
+      left:"50%",
+      height: '89vh',
+      top: '95px',
+      transform:"translateX(-50%)",
       background: '#09090957',
       overflow: 'scroll',
       padding:" 0 26px"

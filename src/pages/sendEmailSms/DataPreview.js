@@ -14,7 +14,9 @@ import {
   Box,
   Typography,
   Grid,
-  Modal
+  Modal,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { CloseOutlined } from '@ant-design/icons';
 
@@ -294,9 +296,34 @@ const DataPreview = () => {
           setResData={setResData}
         />
       )}
-      {resData && <PreviewData resData={resData} setResData={setResData} />}
+      {console.log(resData)}
+      <>
+      {resData && resData.message && <SnackBar />}
+      </>
+      {resData && !resData.message && <PreviewData resData={resData} setResData={setResData} />}
     </Container>
   );
 };
+
+
+
+const SnackBar = ()=>{
+  const [open, setOpen] = React.useState(true);
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+  return(
+    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical:"top", horizontal:"right" }}>
+    <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+      Scheduled Successfully
+    </Alert>
+  </Snackbar>
+  )
+}
 
 export default DataPreview;

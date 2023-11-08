@@ -9,6 +9,7 @@ import UserList from 'pages/authentication/userList';
 import DataPreview from 'pages/sendEmailSms/DataPreview';
 import AuthRegister from 'pages/authentication/auth-forms/AuthRegister';
 import CredentialManager from 'pages/credentials/credentialManager';
+import ScheduledManager from "pages/scheduled/ScheduledManager"
 
 // render - dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
@@ -77,6 +78,14 @@ const MainRoutes = {
       element: (
         <AuthRoute>
           <CredentialManager />
+        </AuthRoute>
+      )
+    },
+    {
+      path: 'scheduled',
+      element: (
+        <AuthRoute>
+          <ScheduledManager />
         </AuthRoute>
       )
     },

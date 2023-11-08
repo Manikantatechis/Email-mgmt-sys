@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, Grid, InputLabel, FormControl, Button, Stack, Select, MenuItem, Container, CircularProgress, } from '@mui/material';
+import { TextField, Grid, InputLabel, FormControl, Button, Stack, Select, MenuItem, Container, CircularProgress } from '@mui/material';
 import { getGmailTemplatesNames, getKixieTemplatesNames } from 'services/templateService';
 import { getGmailCredNames, getKixieCredNames } from 'services/credentialsService';
 import { sendMessage } from 'services/messageService';
@@ -9,7 +9,6 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 // or if you are using a different date library
 // import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-
 
 const SMS = 'sms';
 const EMAIL = 'email';
@@ -60,6 +59,37 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
   // Handler for the DateTimePicker change
   const handleDateTimeChange = (newValue) => {
     setSelectedDateTime(newValue);
+  };
+
+  const handleSchedule = async () => {
+    const actionData = {};
+    setIsSendLoading(true);
+
+    if (actionType === SMS || actionType === BOTH) {
+      actionData.kixieCredId = kixieNo;
+      actionData.kixieTemplateId = kixieTemplate;
+    }
+
+    if (actionType === EMAIL || actionType === BOTH) {
+      actionData.emailCredId = mailId;
+      actionData.emailTemplateId = emailTemplate;
+    }
+    try {
+      const res = await sendMessage({ actionData, tableData, actionType, scheduledTime: selectedDateTime });
+
+      setResData(res);
+      setIsSendLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+
+    // Clear the selected values if needed
+    setKixieTemplate('');
+    setEmailTemplate('');
+    setMailId('');
+    setKixieNo('');
+    setActionType(false);
+    setIsSendLoading(false);
   };
 
   const fetchData = async () => {
@@ -129,107 +159,113 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-    <Container
-      style={{
-        width: '100vw',
-        position: 'fixed',
-        height: '100vh',
-        top: '0',
-        right: '0',
-        background: '#09090957',
-        overflow: 'hidden'
-      }}
-      maxWidth={false}
-    >
-      <Grid
-        container
-        spacing={3}
+      <Container
         style={{
-          transform: 'translate(-50%, -50%)',
+          width: '100vw',
           position: 'fixed',
-          top: '50%',
-          left: '50%',
-          maxWidth: '400px',
-          background: 'white',
-          paddingRight: '24px',
-          paddingBottom: '24px'
+          height: '100vh',
+          top: '0',
+          right: '0',
+          background: '#09090957',
+          overflow: 'hidden'
         }}
+        maxWidth={false}
       >
-        {actionType === SMS || actionType === BOTH ? (
-          <>
-            <Dropdown
-              label="Kixie Template"
-              id="kixie-template"
-              value={kixieTemplate}
-              onChange={(e) => setKixieTemplate(e.target.value)}
-              options={names.kixieTN}
-              isLoading={loading}
-            />
-            <Dropdown
-              label="Kixie No"
-              id="kixie-no"
-              value={kixieNo}
-              onChange={(e) => setKixieNo(e.target.value)}
-              options={names.kixieCN}
-              isLoading={loading}
-            />
-          </>
-        ) : null}
-        {actionType === EMAIL || actionType === BOTH ? (
-          <>
-            <Dropdown
-              label="Email Template"
-              id="email-template"
-              value={emailTemplate}
-              onChange={(e) => setEmailTemplate(e.target.value)}
-              options={names.gmailTN}
-              isLoading={loading}
-            />
-            <Dropdown
-              label="Mail Id"
-              id="mail-id"
-              value={mailId}
-              onChange={(e) => setMailId(e.target.value)}
-              options={names.gmailCN}
-              isLoading={loading}
-            />
-          </>
-        ) : null}
-        <Grid item xs={12}>
-    <Stack spacing={1}>
-      <InputLabel >Select Date and Time</InputLabel>
+        <Grid
+          container
+          spacing={3}
+          style={{
+            transform: 'translate(-50%, -50%)',
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            maxWidth: '400px',
+            background: 'white',
+            paddingRight: '24px',
+            paddingBottom: '24px'
+          }}
+        >
+          {actionType === SMS || actionType === BOTH ? (
+            <>
+              <Dropdown
+                label="Kixie Template"
+                id="kixie-template"
+                value={kixieTemplate}
+                onChange={(e) => setKixieTemplate(e.target.value)}
+                options={names.kixieTN}
+                isLoading={loading}
+              />
+              <Dropdown
+                label="Kixie No"
+                id="kixie-no"
+                value={kixieNo}
+                onChange={(e) => setKixieNo(e.target.value)}
+                options={names.kixieCN}
+                isLoading={loading}
+              />
+            </>
+          ) : null}
+          {actionType === EMAIL || actionType === BOTH ? (
+            <>
+              <Dropdown
+                label="Email Template"
+                id="email-template"
+                value={emailTemplate}
+                onChange={(e) => setEmailTemplate(e.target.value)}
+                options={names.gmailTN}
+                isLoading={loading}
+              />
+              <Dropdown
+                label="Mail Id"
+                id="mail-id"
+                value={mailId}
+                onChange={(e) => setMailId(e.target.value)}
+                options={names.gmailCN}
+                isLoading={loading}
+              />
+            </>
+          ) : null}
+          <Grid item xs={12}>
+            <Stack spacing={1}>
+              <InputLabel>Select Date and Time</InputLabel>
 
-      
-        <DateTimePicker
-          // label="Select Date and Time"
-          value={selectedDateTime}
-          onChange={handleDateTimeChange}
-          renderInput={(params) => <TextField {...params} />}
-        />
+              <DateTimePicker
+                // label="Select Date and Time"
+                value={selectedDateTime}
+                onChange={handleDateTimeChange}
+                minutesStep="1"
+                renderInput={(params) => <TextField {...params} />}
+              />
+            </Stack>
+          </Grid>
+          <Grid item xs={12} sx={{ display: 'flex', gap: '10px' }}>
+            <Button sx={{ flex: 1 }} variant="contained" color="primary" onClick={handleSend} fullWidth disabled={loadingSend}>
+              {loadingSend ? <CircularProgress size={24} color="inherit" /> : 'Send'}
+            </Button>
 
-    </Stack>
-  </Grid>
-        <Grid item xs={12} sx={{display:"flex", gap:"10px"}}>
-          
-            <Button sx={{flex: 1, }}variant="contained" color="primary" onClick={handleSend} fullWidth disabled={loadingSend}>
-            {loadingSend ? <CircularProgress size={24} color="inherit" /> : 'Send'}
-          </Button>
-          
-          
-          
-         
-          <Button sx={{flex: 1}}variant="contained"  onClick={handleCancel} fullWidth style={{flex: 1, background:"rgb(76, 175, 80)"}}>
-            Schedule
-          </Button>
-          
+            <Button
+              sx={{ flex: 1 }}
+              variant="contained"
+              onClick={handleSchedule}
+              fullWidth
+              style={{ flex: 1, background: 'rgb(76, 175, 80)' }}
+              disabled={loadingSend}
+            >
+              {loadingSend ? <CircularProgress size={24} color="inherit" /> : 'Schedule'}
+            </Button>
 
-          <Button sx={{flex: 1}}variant="contained"  onClick={handleCancel} fullWidth style={{ height:"fit-content", background:"rgb(243, 69, 69)"}}>
-            Cancel
-          </Button>
+            <Button
+              sx={{ flex: 1 }}
+              variant="contained"
+              onClick={handleCancel}
+              fullWidth
+              style={{ height: 'fit-content', background: 'rgb(243, 69, 69)' }}
+            >
+              Cancel
+            </Button>
+          </Grid>
         </Grid>
-        
-      </Grid>
-    </Container>
+      </Container>
     </LocalizationProvider>
   );
 };

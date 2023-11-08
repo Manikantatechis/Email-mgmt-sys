@@ -15,7 +15,7 @@ const AuthFooter = () => {
         textAlign={matchDownSM ? 'center' : 'inherit'}
       >
         <Typography variant="subtitle2" color="secondary" component="span">
-          &copy; Tech IS React Dashboard
+          &copy; Tech IS Customer Outreach
         </Typography>
 
         <Stack direction={matchDownSM ? 'column' : 'row'} spacing={matchDownSM ? 1 : 3} textAlign={matchDownSM ? 'center' : 'inherit'}>
@@ -29,14 +29,7 @@ const AuthFooter = () => {
           >
             Privacy Policy
           </Typography>
-          <Typography
-            variant="subtitle2"
-            color="secondary"
-            component={Link}
-            href="support@techis.io?"
-            // target="_blank"
-            underline="hover"
-          >
+          <Typography variant="subtitle2" color="secondary" component="a" href="mailto:support@techis.io" underline="hover">
             Support
           </Typography>
         </Stack>

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 
 // material-ui
 import {
@@ -8,7 +7,6 @@ import {
   FormControlLabel,
   FormHelperText,
   Grid,
-  Link,
   IconButton,
   InputAdornment,
   InputLabel,
@@ -34,7 +32,6 @@ import { loginUser } from 'store/auth/authThunks';
 // ============================||LOGIN ||============================ //
 
 const AuthLogin = () => {
-  const [checked, setChecked] = React.useState(false);
 
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
@@ -141,8 +138,8 @@ const dispatch = useDispatch()
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={checked}
-                        onChange={(event) => setChecked(event.target.checked)}
+                        checked={true}
+                        // onChange={(event) => setChecked(event.target.checked)}
                         name="checked"
                         color="primary"
                         size="small"
@@ -150,9 +147,9 @@ const dispatch = useDispatch()
                     }
                     label={<Typography variant="h6">Keep me sign in</Typography>}
                   />
-                  <Link variant="h6" component={RouterLink} to="" color="text.primary">
+                  <Button variant="h6" onClick={()=>alert("Please contact your admin to reset your password")} color="text.primary">
                     Forgot Password?
-                  </Link>
+                  </Button>
                 </Stack>
               </Grid>
               {errors.submit && (

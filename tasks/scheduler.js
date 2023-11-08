@@ -8,8 +8,6 @@ const sendQueue = new Queue('sendMessages', {
     host: "redis-12441.c81.us-east-1-2.ec2.cloud.redislabs.com",
     port: 12441,
     password: 'T86u5478PMBrp39WgJ2chr4fGPj7sPo5'
-    // if you have a password set for Redis, you need to include it here
-    // password: "yourpassword",
   },
 });
 

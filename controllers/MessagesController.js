@@ -10,9 +10,6 @@ const EmailBatch = require("../models/emailModel");
 const ScheduledTask = require("../models/scheduledTaskModel");
 const sendMessagesService = require("../services/sendMessageService");
 
-
-
-
 const sendMessages = asyncHandler(async (req, res) => {
   const {
     userId,
@@ -33,6 +30,14 @@ const sendMessages = asyncHandler(async (req, res) => {
       { taskId: newTask._id }, // Pass taskId to the queue
       { delay: new Date(scheduledTime) - Date.now() }
     );
+    const currentTime = new Date();
+    const scheduledTaskTime = new Date(scheduledTime);
+    // Calculate the time difference in minutes
+    const timeDifferenceInMinutes = Math.floor(
+      (scheduledTaskTime - currentTime) / (1000 * 60)
+    );
+
+    console.log(`Time difference in minutes: ${timeDifferenceInMinutes}`);
 
     res.status(200).json({ message: "Scheduled successfully!" });
   } else {
@@ -45,9 +50,5 @@ const sendMessages = asyncHandler(async (req, res) => {
     res.status(200).json(summary);
   }
 });
-
-
-
-
 
 module.exports = { sendMessages };

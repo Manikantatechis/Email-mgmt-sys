@@ -61,6 +61,8 @@ async function sendIndividualEmail(transporter, mailOptions, attempt = 1) {
 
 async function sendEmail(gmailCredentials, gmailTemplate, tableData, batchId, userId) {
   let successfulEmailsCount = 0;
+  let failedEmailsCount = 0;
+  
   let successfulEmails = [];
   let failedEmails = [];
   let transporter = createTransporter(gmailCredentials)
@@ -77,6 +79,7 @@ async function sendEmail(gmailCredentials, gmailTemplate, tableData, batchId, us
       successfulEmailsCount++;
       successfulEmails.push(result);
     } else {
+      failedEmailsCount ++
       failedEmails.push(result);
     }
     await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_EMAILS));
@@ -86,6 +89,7 @@ async function sendEmail(gmailCredentials, gmailTemplate, tableData, batchId, us
     batchId,
     userId,
     successfulEmailsCount,
+    failedEmailsCount,
     gmailCredentials._id,
     gmailTemplate._id
   );

@@ -6,21 +6,22 @@ const deleteOldNotifications = async () => {
   twoDaysAgo.setDate(twoDaysAgo.getDate() - 2); // Subtract 1 day
 
   try {
-    await User.updateMany(
+    const result = await User.updateMany(
       {},
       {
         $pull: {
           notifications: {
-            timestamp: { $lt: twoDaysAgo },
+            time: { $lt: twoDaysAgo },
           },
         },
       }
     );
-
-    console.log("Old notifications deleted.");
+  
+    console.log("Deletion result:", result);
   } catch (error) {
     console.error("Error deleting old notifications:", error);
   }
+  
 };
 
 module.exports = deleteOldNotifications;

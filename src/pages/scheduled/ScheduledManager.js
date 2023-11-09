@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button, Container, Paper, Table, 
+import {  Container, Paper, Table, 
     // TableBody, 
     TableCell, TableContainer, TableHead, TableRow, Box } from '@mui/material';
 // import GmailTemplateRow from './row/GmailTemplateRow';
@@ -46,20 +46,9 @@ const TemplateManager = () => {
   return (
     <Container>
       <Paper elevation={3} sx={{ borderRadius: 2, padding: 4, minHeight: '70vh' }}>
-
-
-
-
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 3, marginBottom: 3 }}>
-          <Container component="span">Kixie Templates</Container>
-          <Button
-            variant="contained"
-            color="primary"
-            style={{ whiteSpace: 'nowrap', padding: '7px 30px' }}
-            onClick={() => setIsKixieTemplateOpen(true)}
-          >
-            Add Kixie Template
-          </Button>
+          <Container component="span">Scheduled Messages</Container>
+          
         </Box>
 
         <TableContainer component={Paper} sx={{ height: '30vh', overflowY: 'scroll' }}>

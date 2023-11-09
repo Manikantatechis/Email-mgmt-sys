@@ -15,7 +15,11 @@ const sendMessages = asyncHandler(async (req, res) => {
     userId,
     body: { actionType, actionData, tableData, scheduledTime },
   } = req;
-
+  if (!actionType || !actionData || !tableData) {
+    res.status(400);
+    throw new Error("Invalid Data");
+  }
+  console.log(actionData);
   if (scheduledTime && new Date(scheduledTime) > new Date()) {
     const newTask = new ScheduledTask({
       userId,

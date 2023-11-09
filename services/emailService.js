@@ -4,8 +4,8 @@ const { encrypt } = require("../utils/encrytpAndDecryptText");
 const EmailBatch = require("../models/emailModel");
 
 const MAX_RETRIES = 3; // Number of times to retry sending
-const RETRY_DELAY = 5000; // Delay between retries in milliseconds (5 seconds)
-const DELAY_BETWEEN_EMAILS = 1000; // Delay between sending individual emails (1 second)
+const RETRY_DELAY = 500; // Delay between retries in milliseconds (5 seconds)
+const DELAY_BETWEEN_EMAILS = 300; // Delay between sending individual emails (1 second)
 const BACKEND_URL = process.env.BACKEND_URL; // Read once and use everywhere
 
 // Create a single transporter object using the default SMTP transport
@@ -89,7 +89,6 @@ async function sendEmail(gmailCredentials, gmailTemplate, tableData, batchId, us
     batchId,
     userId,
     successfulEmailsCount,
-    failedEmailsCount,
     gmailCredentials._id,
     gmailTemplate._id
   );

@@ -1,79 +1,55 @@
-import React, { useEffect } from 'react';
-import {  Container, Paper, Table, 
-    // TableBody, 
-    TableCell, TableContainer, TableHead, TableRow, Box } from '@mui/material';
-// import GmailTemplateRow from './row/GmailTemplateRow';
-// import KixieTemplateRow from './row/ScheduledRow';
-import { useDispatch } from 'react-redux';
-import { getGmailTemplates, getKixieTemplates } from 'store/templates/templateThunk';
-// import {  selectKixieTemplates } from 'store/templates/templateSlice';
-
+import React, { useEffect, useState } from 'react';
+import { Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box } from '@mui/material';
+import ScheduledRow from './row/ScheduledRow';
+import { getAllScheduledTasks } from 'services/scheduledService';
 
 const TemplateManager = () => {
-//   const [isKixieTemplateOpen, setIsKixieTemplateOpen] = useState(null);
-//   const [isGmailTemplateOpen, setIsGmailTemplateOpen] = useState(null);
-//   const [actionType, setActionType] = useState(null)
+ 
+  const [scheduledData, setScheduledData] = useState();
 
-//   const handleGmailTemplateEdit = (id)=>{
-//     setActionType({id, type:'edit'})
-//     setIsGmailTemplateOpen(true)
-
-    
-//   }
-
-//   const handleKixieTemplateEdit = (id)=>{
-//     setActionType({id, type:'edit'})
-//     setIsKixieTemplateOpen(true)
-    
-//   }
-
-//   const gmailTemplates = useSelector(selectGmailTemplates);
-
-//   const kixieTemplates = useSelector(selectKixieTemplates);
-
-//   const isGmailLoading = useSelector(selectIsGmailLoading);
-//   const isKixieLoading = useSelector(selectIsKixieLoading);
-
-
-  const dispatch = useDispatch();
-//   const role = localStorage.getItem('userRole');
+  const getData = async ()=> {
+    const resData = await getAllScheduledTasks();
+    if (resData) {
+      setScheduledData(resData);
+      console.log(resData);
+    }
+  }
 
   useEffect(() => {
-    dispatch(getGmailTemplates());
-    dispatch(getKixieTemplates());
+    getData()
   }, []);
+  const role = localStorage.getItem('userRole');
 
   return (
     <Container>
       <Paper elevation={3} sx={{ borderRadius: 2, padding: 4, minHeight: '70vh' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 3, marginBottom: 3 }}>
           <Container component="span">Scheduled Messages</Container>
-          
         </Box>
 
-        <TableContainer component={Paper} sx={{ height: '30vh', overflowY: 'scroll' }}>
+        <TableContainer component={Paper} sx={{ overflowY: 'scroll' }}>
           <Table>
             <TableHead>
               <TableRow>
-              <TableCell>Sl No</TableCell>
-              <TableCell>Type</TableCell>
+                <TableCell sx={{textAlign:"center"}}>Sl No</TableCell>
+                <TableCell sx={{textAlign:"center"}}>Type</TableCell>
 
-                <TableCell>Count</TableCell>
-                <TableCell>Created</TableCell>
+                <TableCell sx={{textAlign:"center"}}>Count</TableCell>
+                <TableCell sx={{textAlign:"center"}}>Created</TableCell>
 
-                <TableCell>Scheduled</TableCell>
+                <TableCell sx={{textAlign:"center"}}>Scheduled</TableCell>
 
-                <TableCell>Status</TableCell>
-                <TableCell>Cancel</TableCell>
-                <TableCell>Report</TableCell>
-
+                <TableCell sx={{textAlign:"center"}}>Status</TableCell>
+                <TableCell sx={{textAlign:"center"}}>Cancel/Report</TableCell>
               </TableRow>
             </TableHead>
-            {/* <TableBody>
-              {kixieTemplates &&
-                kixieTemplates.length > 0 &&
-                kixieTemplates.map((template) => <KixieTemplateRow key={template.id} {...template} role={role} handleKixieTemplateEdit={handleKixieTemplateEdit} />)}
-            </TableBody> */}
+            <TableBody>
+              {console.log(scheduledData)}
+              {scheduledData &&
+                scheduledData.data &&
+                scheduledData.data.length > 0 &&
+                scheduledData.data.map((data, index) => <ScheduledRow index={index} key={data._id} {...data} role={role} />)}
+            </TableBody>
           </Table>
         </TableContainer>
       </Paper>

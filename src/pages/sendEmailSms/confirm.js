@@ -75,9 +75,9 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
       actionData.emailTemplateId = emailTemplate;
     }
     try {
-      const res = await sendMessage({ actionData, tableData, actionType, scheduledTime: selectedDateTime });
+      await sendMessage({ actionData, tableData, actionType, scheduledTime: selectedDateTime });
 
-      setResData(res);
+      setResData(null);
       setIsSendLoading(false);
     } catch (error) {
       console.log(error);

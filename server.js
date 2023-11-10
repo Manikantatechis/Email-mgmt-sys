@@ -20,6 +20,7 @@ const cron = require("node-cron");
 const cleanupTask = require("./tasks/cleanup");
 const { sendQueue } = require("./tasks/scheduler");
 const ScheduledTask = require("./models/scheduledTaskModel.js");
+const scheduledRoutes = require("./routes/scheduledTaskRoutes.js")
 
 const app = express();
 const server = http.createServer(app);
@@ -91,6 +92,7 @@ app.use("/api/gmail-template", gmailTemplateRoutes);
 app.use("/api/kixie-template", kixieTemplateRoutes);
 app.use("/api/message", sendSmsRoutes);
 app.use("/reports", reportRoutes);
+app.use("/api/schedule", scheduledRoutes)
 
 app.enable("trust proxy");
 app.use("/api/track", trackRoute);

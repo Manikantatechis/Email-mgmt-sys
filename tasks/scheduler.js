@@ -18,7 +18,7 @@ sendQueue.process(async (job) => {
 
     if (task && task.status === "pending") {
       const { userId, actionType, actionData, tableData } = task;
-      console.log({ userId, actionType, actionData, tableData })
+
       const summary = await sendMessagesService(
         userId,
         actionType,
@@ -34,7 +34,7 @@ sendQueue.process(async (job) => {
           tableData: [], // Set tableData to an empty array or use $unset to remove the field
         }
       );
-      console.log(taskData);
+
     }
   } catch (error) {
     console.error("Error processing task:", error);

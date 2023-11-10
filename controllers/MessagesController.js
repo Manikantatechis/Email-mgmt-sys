@@ -19,7 +19,7 @@ const sendMessages = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Invalid Data");
   }
-  console.log(actionData);
+  // console.log(actionData);
   if (scheduledTime && new Date(scheduledTime) > new Date()) {
     const newTask = new ScheduledTask({
       userId,

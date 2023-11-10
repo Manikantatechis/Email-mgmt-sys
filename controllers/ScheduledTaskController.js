@@ -4,31 +4,46 @@ const ScheduledTask = require("../models/scheduledTaskModel");
 // Get a list of all pending and completed tasks for a user with specific fields
 const getAllScheduledTasks = asyncHandler(async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.userId;
+
     const tasks = await ScheduledTask.find(
       {
         userId: userId,
         status: { $in: ["pending", "completed"] },
       },
-      "_id actionType scheduledTime status summary._id"
+      "_id actionType scheduledTime status summary tableData "
     )
       .lean()
       .exec();
 
     // Map the tasks to include specific fields and conditionally include summary._id
-    const transformedTasks = tasks.map((task) => ({
-      _id: task._id,
-      Type: task.actionType,
-      Count:
-        task.status === "completed" && task.summary
-          ? task.summary.smsSummary.length +
-            task.summary.emailSummary.successfulEmails.length
-          : null, // Only calculate count if completed
-      Created: task._id.getTimestamp(),
-      Scheduled: task.scheduledTime,
-      Status: task.status,
-      SummaryId: task.status === "completed" ? task.summary?._id : undefined, // Only include summary._id for completed tasks
-    }));
+    const transformedTasks = tasks.map((task) => {
+      const smsSummaryLength =
+        task.status === "completed" && task.summary && task.summary.smsSummary
+          ? task.summary.smsSummary.length
+          : 0;
+    
+      const successfulEmailsLength =
+        task.status === "completed" &&
+        task.summary &&
+        task.summary.emailSummary &&
+        task.summary.emailSummary.successfulEmails
+          ? task.summary.emailSummary.successfulEmails.length
+          : 0;
+    
+      const scheduledLength = task.tableData && task.tableData.length
+
+    
+      return {
+        _id: task._id,
+        type: task.actionType,
+        count: task.status === "completed" ? (smsSummaryLength || successfulEmailsLength) : scheduledLength,
+        created: task._id.getTimestamp(),
+        scheduled: task.scheduledTime,
+        status: task.status,
+      };
+    });
+    
 
     res.status(200).json({
       success: true,

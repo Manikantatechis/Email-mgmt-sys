@@ -5,9 +5,9 @@ const sendMessagesService = require("../services/sendMessageService");
 
 const sendQueue = new Queue("sendMessages", {
   redis: {
-    host: "redis-12441.c81.us-east-1-2.ec2.cloud.redislabs.com",
-    port: 12441,
-    password: "T86u5478PMBrp39WgJ2chr4fGPj7sPo5",
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password:process.env.REDIS_PSSWD,
   },
 });
 
@@ -18,15 +18,17 @@ sendQueue.process(async (job) => {
 
     if (task && task.status === "pending") {
       const { userId, actionType, actionData, tableData } = task;
+      const scheduled = true
 
       const summary = await sendMessagesService(
         userId,
         actionType,
         actionData,
-        tableData
+        tableData,
+        scheduled
       );
       console.log(summary);
-      const taskData = await ScheduledTask.updateOne(
+      await ScheduledTask.updateOne(
         { _id: taskId },
         {
           status: "completed",

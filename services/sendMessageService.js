@@ -7,7 +7,7 @@ const sendEmail = require("./emailService");
 const KixieTemplate = require("../models/kixieTemplateModel");
 const sendSms = require("./smsService");
 
-async function sendMessagesService(userId, actionType, actionData, tableData) {
+async function sendMessagesService(userId, actionType, actionData, tableData, scheduled=false) {
   // Validate actionData based on actionType
   validateActionData(actionType, actionData);
 
@@ -63,7 +63,8 @@ async function sendMessagesService(userId, actionType, actionData, tableData) {
       gmailTemplate,
       tableData,
       batchId,
-      userId
+      userId,
+      scheduled
     );
   }
 

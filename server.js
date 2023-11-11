@@ -20,7 +20,7 @@ const cron = require("node-cron");
 const cleanupTask = require("./tasks/cleanup");
 const { sendQueue } = require("./tasks/scheduler");
 const ScheduledTask = require("./models/scheduledTaskModel.js");
-const scheduledRoutes = require("./routes/scheduledTaskRoutes.js")
+const scheduledRoutes = require("./routes/scheduledTaskRoutes.js");
 
 const app = express();
 const server = http.createServer(app);
@@ -92,7 +92,7 @@ app.use("/api/gmail-template", gmailTemplateRoutes);
 app.use("/api/kixie-template", kixieTemplateRoutes);
 app.use("/api/message", sendSmsRoutes);
 app.use("/reports", reportRoutes);
-app.use("/api/schedule", scheduledRoutes)
+app.use("/api/schedule", scheduledRoutes);
 
 app.enable("trust proxy");
 app.use("/api/track", trackRoute);
@@ -111,9 +111,11 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(async () => {
+    console.log("hello")
     const pendingTasks = await ScheduledTask.find({ status: "pending" });
+    console.log(pendingTasks)
     for (let task of pendingTasks) {
-      console.log("first");
+      console.log("pending task found", task._id);
       if (task.scheduledTime > new Date()) {
         sendQueue.add(
           { taskId: task._id },

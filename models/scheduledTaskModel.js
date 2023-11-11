@@ -104,12 +104,6 @@ const tableDataEntrySchema = new Schema(
         return this.actionType === "email" || this.actionType === "both";
       },
       lowercase: true,
-      validate: {
-        validator: function (v) {
-          return /^\S+@\S+\.\S+$/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid email!`,
-      },
     },
   },
   { _id: false, required: false }
@@ -136,7 +130,7 @@ const scheduledTaskSchema = new Schema({
     validate: {
       validator: function (v) {
         // Ensure the array length does not exceed 100
-        return v.length <= 100;
+        return v.length <= 1000;
       },
       message: (props) => `${props.path} exceeds the limit of 100 entries`,
     },

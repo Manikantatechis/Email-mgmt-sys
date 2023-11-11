@@ -7,6 +7,7 @@ const sendQueue = new Queue("sendMessages", {
   redis: {
     host: process.env.REDIS_HOST,
     port: process.env.REDIS_PORT,
+    Username: "default",
     password:process.env.REDIS_PSSWD,
   },
 });

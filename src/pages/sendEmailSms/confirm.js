@@ -39,7 +39,7 @@ const Dropdown = ({ label, id, value, onChange, options, isLoading }) => (
   </Grid>
 );
 
-const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend, setIsSendLoading }) => {
+const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend, setIsSendLoading, handleClear }) => {
   const [kixieTemplate, setKixieTemplate] = useState('');
   const [emailTemplate, setEmailTemplate] = useState('');
   const [mailId, setMailId] = useState('');
@@ -75,10 +75,11 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
       actionData.emailTemplateId = emailTemplate;
     }
     try {
-      await sendMessage({ actionData, tableData, actionType, scheduledTime: selectedDateTime });
+      const resData = await sendMessage({ actionData, tableData, actionType, scheduledTime: selectedDateTime });
 
-      setResData(null);
+      setResData(resData);
       setIsSendLoading(false);
+      handleClear();
     } catch (error) {
       console.log(error);
     }
@@ -144,6 +145,7 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
 
       setResData(res);
       setIsSendLoading(false);
+      handleClear();
     } catch (error) {
       console.log(error);
     }
@@ -225,19 +227,21 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
               />
             </>
           ) : null}
-          <Grid item xs={12}>
-            <Stack spacing={1}>
-              <InputLabel>Select Date and Time</InputLabel>
+<Grid item xs={12}>
+  <Stack spacing={1}>
+    <InputLabel>Select Date and Time</InputLabel>
 
-              <DateTimePicker
-                // label="Select Date and Time"
-                value={selectedDateTime}
-                onChange={handleDateTimeChange}
-                minutesStep="1"
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </Stack>
-          </Grid>
+    <DateTimePicker
+      minDate={new Date()}
+      maxDate={new Date(new Date().setDate(new Date().getDate() + 7))} // Set maxDate to 7 days from now
+      value={selectedDateTime} // This should be a state variable holding the current selected date
+      onChange={handleDateTimeChange}
+      minutesStep={1}
+      renderInput={(params) => <TextField {...params} />}
+    />
+  </Stack>
+</Grid>
+
           <Grid item xs={12} sx={{ display: 'flex', gap: '10px' }}>
             <Button sx={{ flex: 1 }} variant="contained" color="primary" onClick={handleSend} fullWidth disabled={loadingSend}>
               {loadingSend ? <CircularProgress size={24} color="inherit" /> : 'Send'}

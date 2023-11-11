@@ -3,14 +3,7 @@ const ScheduledTask = require("../models/scheduledTaskModel");
 const sendMessagesService = require("../services/sendMessageService");
 // const { sendMessagesService } = require('./service');
 
-const sendQueue = new Queue("sendMessages", {
-  redis: {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    Username: "default",
-    password:process.env.REDIS_PSSWD,
-  },
-});
+const sendQueue = new Queue("sendMessages", process.env.REDIS_URL);
 
 sendQueue.process(async (job) => {
   try {

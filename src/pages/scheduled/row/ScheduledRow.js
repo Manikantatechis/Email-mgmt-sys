@@ -169,8 +169,8 @@ const ScheduledRow = ({ index, _id, count, created, scheduled, status, type, set
         <Report
           resData={{
             smsSummary: data.smsSummary,
-            successfulEmails: data.emailSummary.successfulEmails,
-            failedEmails: data.emailSummary.failedEmails
+            successfulEmails: data?.emailSummary?.successfulEmails,
+            failedEmails: data?.emailSummary?.failedEmails
           }}
           handleClose={handleClose}
         />

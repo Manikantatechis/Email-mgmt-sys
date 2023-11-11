@@ -55,21 +55,21 @@ const PreviewData = ({ resData, handleClose }) => {
         justifyContent: 'space-between' // Push content to the top and bottom
       }}
     >
-      {resData?.smsSummary && resData?.smsSummary.length > 0 && (
+      {resData?.smsSummary && resData?.smsSummary?.length > 0 && (
         <Paper
           elevation={3}
-          style={{ height: resData?.successfulEmails.length > 0 || resData?.failedEmails.length > 0 ? '40vh' : '80vh', overflow: 'scroll' }}
+          style={{ height: resData?.successfulEmails?.length > 0 || resData?.failedEmails?.length > 0 ? '40vh' : '80vh', overflow: 'scroll' }}
         >
           <h2 style={{ paddingLeft: 20 }}>SMS Summary</h2>
           <SummaryTable summary={resData.smsSummary} type="sms" />
         </Paper>
       )}
-      {resData?.failedEmails && resData?.failedEmails.length > 0 && (
+      {resData?.failedEmails && resData?.failedEmails?.length > 0 && (
         <Paper
           elevation={3}
           style={{
             marginTop: '20px',
-            height: resData?.smsSummary.length > 0 || resData?.successfulEmails.length > 0 ? '40vh' : '80vh',
+            height: resData?.smsSummary?.length > 0 || resData?.successfulEmails?.length > 0 ? '40vh' : '80vh',
             overflow: 'scroll'
           }}
         >
@@ -83,12 +83,12 @@ const PreviewData = ({ resData, handleClose }) => {
           <SummaryTable summary={resData.failedEmails} type="email" />
         </Paper>
       )}
-      {resData?.successfulEmails && resData?.successfulEmails.length > 0 && (
+      {resData?.successfulEmails && resData?.successfulEmails?.length > 0 && (
         <Paper
           elevation={3}
           style={{
             marginTop: '20px',
-            height: resData?.smsSummary.length > 0 || resData?.failedEmails.length > 0 ? '40vh' : '80vh',
+            height: resData?.smsSummary?.length > 0 || resData?.failedEmails?.length > 0 ? '40vh' : '80vh',
             overflow: 'scroll'
           }}
         >

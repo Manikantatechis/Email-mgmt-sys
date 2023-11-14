@@ -12,8 +12,6 @@ const emailTracking = asyncHandler(async (req, res) => {
     console.error("Invalid encrypted data format");
   }
 
-  console.log("client ip", req.clientIPv4);
-
   const form = new FormData();
   form.append("ip", req.clientIPv4);
   form.append("source", "ipinfo");
@@ -29,7 +27,7 @@ const emailTracking = asyncHandler(async (req, res) => {
       const emailBatch = await EmailBatch.findById({
         _id: trackingInfo.batchId,
       });
-      console.log({ decryptedData });
+      // console.log({ decryptedData });
 
       // Check if an email entry already exists
       const existingEmail = emailBatch.openedEmail.find(
@@ -49,8 +47,8 @@ const emailTracking = asyncHandler(async (req, res) => {
             },
           }
         );
-        console.log(res);
-        console.log(location.data.res)
+        // console.log(res);
+        // console.log(location.data.res)
         sendNotification(emailBatch.userId, {
           message: "opened again",
           email: trackingInfo.Email,
@@ -75,8 +73,8 @@ const emailTracking = asyncHandler(async (req, res) => {
             },
           }
         );
-        console.log({ res });
-        console.log(location.data.res)
+        // console.log({ res });
+        // console.log(location.data.res)
         sendNotification(emailBatch.userId, {
           message: "opened email",
           email: trackingInfo.Email,

@@ -18,6 +18,9 @@ const socketIo = require("socket.io");
 const { initWebSocketServer } = require("./socketio.js");
 const cron = require("node-cron");
 const cleanupTask = require("./tasks/cleanup");
+const { sendQueue } = require("./tasks/scheduler");
+const ScheduledTask = require("./models/scheduledTaskModel.js");
+const scheduledRoutes = require("./routes/scheduledTaskRoutes.js");
 
 const app = express();
 const server = http.createServer(app);
@@ -25,7 +28,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
   "http://127.0.0.1:5174",
   "http://localhost:3000",
-  "http://127.0.0.1:5173",
+  "http://127.0.0.1:3000",
   "http://localhost:3000",
   process.env.FRONTEND_URL,
   process.env.ADMIN_FRONTEND_URL,
@@ -89,6 +92,7 @@ app.use("/api/gmail-template", gmailTemplateRoutes);
 app.use("/api/kixie-template", kixieTemplateRoutes);
 app.use("/api/message", sendSmsRoutes);
 app.use("/reports", reportRoutes);
+app.use("/api/schedule", scheduledRoutes);
 
 app.enable("trust proxy");
 app.use("/api/track", trackRoute);
@@ -98,12 +102,29 @@ const PORT = process.env.PORT || 8000;
 app.use(errorHandler);
 
 // Scheduled Tasks
-cron.schedule("0 2 * * *", cleanupTask);
+// console.log(new Date().toString())
+cron.schedule("08 14 * * *", cleanupTask);
 
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+  })
+  .then(async () => {
+    console.log("hello")
+    const pendingTasks = await ScheduledTask.find({ status: "pending" });
+    console.log(pendingTasks)
+    for (let task of pendingTasks) {
+      console.log("pending task found", task._id);
+      if (task.scheduledTime > new Date()) {
+        sendQueue.add(
+          { taskId: task._id },
+          { delay: task.scheduledTime - Date.now() }
+        );
+      } else {
+        sendQueue.add({ taskId: task._id });
+      }
+    }
   })
   .then(() => {
     server.listen(PORT, () =>

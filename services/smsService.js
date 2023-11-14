@@ -22,7 +22,6 @@ async function sendSms(kixieCredentials, kixieTemplate, tableData, batchId,  use
 
 		try {
 			const res = await axios.post("https://apig.kixie.com/itn/sendmms", form, { headers: { ...form.getHeaders() } });
-			console.log(res)
 			if(res.data.error){
 				  throw new Error(res.data.error);  
 			}else if(res.data.success){

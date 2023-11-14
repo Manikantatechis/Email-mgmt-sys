@@ -118,22 +118,26 @@ const DataPreview = () => {
       dynamicTyping: true,
       complete: function (results) {
         const validatedData = results.data.map((row, index) => {
-          let newRow = { ...row };
+          let newRow = {};
+          if (row.Name) {
+            newRow.Name = row.Name;
+          }
 
           // Validate phone
           const phoneRegex = /^(\+?1)?[-.\s]?(\d{3})[-.\s]?(\d{3})[-.\s]?(\d{4})$/;
-          if (row.Phone && !phoneRegex.test(row.Phone)) {
+          if (row.Phone && phoneRegex.test(row.Phone)) {
+            newRow.Phone = row.Phone;
+          } else if (row.Phone) {
             console.warn(`Row ${index + 1}: Invalid US phone number - ${row.Phone}`);
-            newRow.Phone = '';
           }
 
           // Validate email
           const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-          if (row.Email && !emailRegex.test(row.Email)) {
+          if (row.Email && emailRegex.test(row.Email)) {
+            newRow.Email = row.Email;
+          } else if (row.Email) {
             console.warn(`Row ${index + 1}: Invalid email address - ${row.Email}`);
-            newRow.Email = '';
           }
-
           return newRow;
         });
 
@@ -330,7 +334,13 @@ const SnackBar = ({ open, setOpen, message }) => {
   };
 
   return (
-    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: 'top', horizontal: 'right' }} sx={{ top: { sm: 90, xs: 75 }, right: { sm: 30, xs: 10 } }}>
+    <Snackbar
+      open={open}
+      autoHideDuration={6000}
+      onClose={handleClose}
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      sx={{ top: { sm: 90, xs: 75 }, right: { sm: 30, xs: 10 } }}
+    >
       <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
         {message}
       </Alert>

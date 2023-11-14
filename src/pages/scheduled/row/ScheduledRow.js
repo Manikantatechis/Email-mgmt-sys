@@ -80,7 +80,7 @@ const ScheduledRow = ({ index, _id, count, created, scheduled, status, type, set
             textAlign: 'center'
           }}
         >
-          {type === 'both' ? 'SMS and Email' : type.charAt(0).toUpperCase() + type.slice(1)}
+          {type === 'both' ? 'SMS and Email' : type === 'sms' ? 'SMS' : 'Email'}
         </TableCell>
         <TableCell
           sx={{

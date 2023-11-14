@@ -13,7 +13,7 @@ const HeaderContent = () => {
 
   return (
     <>
-    <Box sx={{display:"flex", justifyContent:"space-between", width:"100%", alignItems:"center"}}>
+    <Box sx={{display:"flex", justifyContent:"space-between", width:"100%", height:"55px", alignItems:"center"}}>
 
   
       <Box sx={{ width: 'fit-content', ml: { xs: 0, md: 1 },  }}>
@@ -24,7 +24,7 @@ const HeaderContent = () => {
             margin: 0,
             fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
             fontWeight: 500,
-            fontSize: '1.25rem',
+            fontSize: 'clamp(0.5rem, 2vw, 1rem)',
             lineHeight: 1.6,
             letterSpacing: ' 0.0075em'
           }}

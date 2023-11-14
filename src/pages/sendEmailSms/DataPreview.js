@@ -14,7 +14,9 @@ import {
   Box,
   Typography,
   Grid,
-  Modal
+  Modal,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { CloseOutlined } from '@ant-design/icons';
 
@@ -42,14 +44,12 @@ const tableReducer = (state, action) => {
   }
 };
 
-const MemoTableRow = memo(({ row, rowIndex, handleCellChange, onDelete  }) => {
+const MemoTableRow = memo(({ row, rowIndex, handleCellChange, onDelete }) => {
   const [localState, setLocalState] = useState(row);
 
   useEffect(() => {
     setLocalState(row);
   }, [row]);
-
-
 
   const handleBlur = (e, rowIndex, column) => {
     handleCellChange(e, rowIndex, column);
@@ -76,7 +76,7 @@ const MemoTableRow = memo(({ row, rowIndex, handleCellChange, onDelete  }) => {
         </TableCell>
       ))}
       <TableCell>
-        <CloseOutlined onClick={ ()=>onDelete(rowIndex)} style={{ cursor: 'pointer' }} />
+        <CloseOutlined onClick={() => onDelete(rowIndex)} style={{ cursor: 'pointer' }} />
       </TableCell>
     </TableRow>
   );
@@ -89,6 +89,16 @@ const DataPreview = () => {
   const [resData, setResData] = useState(null);
   const [loading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  // Invoke the SnackBar when there is a message and the Snackbar is not already open
+  useEffect(() => {
+    console.log(resData);
+    if (resData?.message && !snackbarOpen) {
+      setSnackbarOpen(true); // Open the Snackbar when there is a new message
+    }
+  }, [resData]);
 
   const handleClick = (type) => {
     if (tableData.length > 0) {
@@ -108,22 +118,26 @@ const DataPreview = () => {
       dynamicTyping: true,
       complete: function (results) {
         const validatedData = results.data.map((row, index) => {
-          let newRow = { ...row };
+          let newRow = {};
+          if (row.Name) {
+            newRow.Name = row.Name;
+          }
 
           // Validate phone
           const phoneRegex = /^(\+?1)?[-.\s]?(\d{3})[-.\s]?(\d{3})[-.\s]?(\d{4})$/;
-          if (row.Phone && !phoneRegex.test(row.Phone)) {
+          if (row.Phone && phoneRegex.test(row.Phone)) {
+            newRow.Phone = row.Phone;
+          } else if (row.Phone) {
             console.warn(`Row ${index + 1}: Invalid US phone number - ${row.Phone}`);
-            newRow.Phone = '';
           }
 
           // Validate email
           const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-          if (row.Email && !emailRegex.test(row.Email)) {
+          if (row.Email && emailRegex.test(row.Email)) {
+            newRow.Email = row.Email;
+          } else if (row.Email) {
             console.warn(`Row ${index + 1}: Invalid email address - ${row.Email}`);
-            newRow.Email = '';
           }
-
           return newRow;
         });
 
@@ -167,8 +181,7 @@ const DataPreview = () => {
 
   const deleteRow = (index) => {
     dispatch({ type: 'DELETE_ROW', rowIndex: index });
-};
-
+  };
 
   const addRow = () => {
     dispatch({ type: 'ADD_ROW' });
@@ -258,7 +271,7 @@ const DataPreview = () => {
           </TableHead>
           <TableBody>
             {tableData.map((row, rowIndex) => (
-              <MemoTableRow row={row} key={rowIndex} rowIndex={rowIndex} onDelete={deleteRow}  handleCellChange={handleCellChange} />
+              <MemoTableRow row={row} key={rowIndex} rowIndex={rowIndex} onDelete={deleteRow} handleCellChange={handleCellChange} />
             ))}
           </TableBody>
         </Table>
@@ -292,11 +305,46 @@ const DataPreview = () => {
           setActionType={setActionType}
           tableData={tableData}
           setResData={setResData}
+          handleClear={handleClear}
         />
       )}
-      {/* {console.log('after', resData)} */}
-      {resData && <PreviewData resData={resData} setResData={setResData} />}
+      {resData && (resData.smsSummary || resData.emailSummary) && (
+        <PreviewData
+          resData={{
+            smsSummary: resData.smsSummary,
+            successfulEmails: resData.emailSummary.successfulEmails,
+            failedEmails: resData.emailSummary.failedEmails
+          }}
+          handleClose={setResData}
+        />
+      )}
+
+      {resData?.message && <SnackBar open={snackbarOpen} setOpen={setSnackbarOpen} message={resData.message} />}
     </Container>
+  );
+};
+
+// SnackBar component
+const SnackBar = ({ open, setOpen, message }) => {
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false); // Close the Snackbar
+  };
+
+  return (
+    <Snackbar
+      open={open}
+      autoHideDuration={6000}
+      onClose={handleClose}
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      sx={{ top: { sm: 90, xs: 75 }, right: { sm: 30, xs: 10 } }}
+    >
+      <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+        {message}
+      </Alert>
+    </Snackbar>
   );
 };
 

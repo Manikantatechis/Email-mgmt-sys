@@ -46,8 +46,6 @@ const IncomeAreaChart = ({ slot, refresh, setRefresh }) => {
   const dataForSlot = useSelector(slot === 'month' ? selectMonthlyEmailReport : selectWeeklyEmailReport);
 
   useEffect(() => {
-    console.log(dataForSlot);
-    console.log(dataForSlot && Object.keys(dataForSlot).length === 0);
     if (refresh) {
       dispatch(getEmailReport(slot)).then((action) => {
         // Checking if the action was fulfilled

@@ -6,12 +6,19 @@ const { sendQueue } = require("../tasks/scheduler");
 const getAllScheduledTasks = asyncHandler(async (req, res) => {
   try {
     const userId = req.userId;
+    const role = req.role;
+    console.log(role)
+    const query = {};
+
+    if (role === "director" || role ==="manager") {
+      query.status = { $in: ["pending", "completed"] };
+    } else {
+      query.userId = userId;
+      query.status = { $in: ["pending", "completed"] };
+    }
 
     const tasks = await ScheduledTask.find(
-      {
-        userId: userId,
-        status: { $in: ["pending", "completed"] },
-      },
+      query,
       "_id actionType scheduledTime status summary tableData "
     )
       .sort({ _id: -1 })
@@ -113,11 +120,9 @@ const cancelScheduledTask = asyncHandler(async (req, res) => {
           .send({ message: `Task and job ${job.id} canceled successfully.` });
       } else {
         // The job was not found in the queue, respond with a different message
-        res
-          .status(200)
-          .send({
-            message: `Task data removed, but job was not found in the queue.`,
-          });
+        res.status(200).send({
+          message: `Task data removed, but job was not found in the queue.`,
+        });
       }
     } else {
       // If the task is not found, respond with an error message

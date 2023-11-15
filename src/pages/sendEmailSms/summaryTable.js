@@ -19,7 +19,7 @@ const SummaryTable = ({ summary, type }) => (
         <TableRow key={index}>
           <TableCell style-={{ textAlign: 'center' }}>{index + 1}</TableCell>
           
-          <TableCell style-={{ textAlign: 'center' }}>{item.Name || item.value.Name  || "N/A"}</TableCell>
+          <TableCell style-={{ textAlign: 'center' }}>{item.Name || (item.value && item.value.Name || "N/A")  || "N/A"}</TableCell>
           {type === 'email' && <TableCell style-={{ textAlign: 'center' }}>{item.Email || 'N/A'}</TableCell>}
           {type === 'sms' && <TableCell style-={{ textAlign: 'center' }}>{item.value.Phone || 'N/A'}</TableCell>}
           <TableCell style-={{ textAlign: 'center' }}>{type === 'sms' ? item.value.status : item.status}</TableCell>

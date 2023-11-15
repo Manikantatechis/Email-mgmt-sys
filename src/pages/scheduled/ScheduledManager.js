@@ -9,11 +9,10 @@ const TemplateManager = () => {
   const [loading, setLoading] = useState(false);
 
   const getData = async () => {
-    setLoading(false);
+    setLoading(true);
     const resData = await getAllScheduledTasks();
     if (resData) {
       setScheduledData(resData);
-      console.log(resData);
     }
     setLoading(false);
   };
@@ -31,8 +30,8 @@ const TemplateManager = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 3, marginBottom: 3 }}>
           <Container component="span">Scheduled Messages</Container>
         </Box>
-        {loading && <Loader />}
-
+      {loading && <Loader />}
+        
         <TableContainer component={Paper} sx={{ overflowY: 'scroll' }}>
           <Table>
             <TableHead>

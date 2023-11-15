@@ -22,6 +22,8 @@ const TemplateManager = () => {
     getData();
   }, []);
   const role = localStorage.getItem('userRole');
+  const userId = JSON.parse(localStorage.getItem("userData"))._id
+  console.log({userId})
 
   return (
     <Container>
@@ -52,7 +54,7 @@ const TemplateManager = () => {
                 scheduledData.data &&
                 scheduledData.data.length > 0 &&
                 scheduledData.data.map((data, index) => (
-                  <ScheduledRow index={index} key={data._id} {...data} role={role} setScheduledData={setScheduledData} />
+                  <ScheduledRow index={index} key={data._id} {...data} role={role} setScheduledData={setScheduledData} user={userId} />
                 ))}
             </TableBody>
           </Table>

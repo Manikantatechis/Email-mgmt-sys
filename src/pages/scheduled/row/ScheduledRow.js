@@ -14,7 +14,7 @@ import {
 import Report from 'pages/sendEmailSms/summaryTable';
 import { cancelScheduledTask, getTaskSummary } from 'services/scheduledService';
 
-const ScheduledRow = ({ index, _id, count, created, scheduled, status, type, setScheduledData }) => {
+const ScheduledRow = ({ index, _id, count, created, scheduled, status, type, setScheduledData, userId, user }) => {
   const [showReport, setShowReport] = useState(false);
   const [data, setData] = useState({});
   const [openDialog, setOpenDialog] = useState(false);
@@ -122,7 +122,8 @@ const ScheduledRow = ({ index, _id, count, created, scheduled, status, type, set
           }}
         >
           {status === 'pending' ? (
-            <Button
+            userId === user ? 
+              <Button
               variant="outlined"
               sx={{
                 zIndex: 1,
@@ -140,7 +141,15 @@ const ScheduledRow = ({ index, _id, count, created, scheduled, status, type, set
               onClick={handleOpenDialog}
             >
               Cancel
-            </Button>
+            </Button> 
+            :<Button
+            variant="outlined"
+            color="secondary"
+            sx={{cursor:"none"}}
+          >
+            Cancel
+          </Button> 
+           
           ) : (
             <Button
               variant="contained"

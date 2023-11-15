@@ -7,6 +7,7 @@ const SummaryTable = ({ summary, type }) => (
     <TableHead>
       <TableRow>
         <TableCell style-={{ textAlign: 'center' }}>SL No</TableCell>
+        <TableCell style-={{ textAlign: 'center' }}>Name</TableCell>
         {type === 'email' && <TableCell style-={{ textAlign: 'center' }}>Email</TableCell>}
         {type === 'sms' && <TableCell style-={{ textAlign: 'center' }}>Phone</TableCell>}
         <TableCell style-={{ textAlign: 'center' }}>Status</TableCell>
@@ -17,6 +18,8 @@ const SummaryTable = ({ summary, type }) => (
       {summary.map((item, index) => (
         <TableRow key={index}>
           <TableCell style-={{ textAlign: 'center' }}>{index + 1}</TableCell>
+          
+          <TableCell style-={{ textAlign: 'center' }}>{item.Name || item.value.Name  || "N/A"}</TableCell>
           {type === 'email' && <TableCell style-={{ textAlign: 'center' }}>{item.Email || 'N/A'}</TableCell>}
           {type === 'sms' && <TableCell style-={{ textAlign: 'center' }}>{item.value.Phone || 'N/A'}</TableCell>}
           <TableCell style-={{ textAlign: 'center' }}>{type === 'sms' ? item.value.status : item.status}</TableCell>

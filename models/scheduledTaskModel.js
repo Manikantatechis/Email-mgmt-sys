@@ -10,6 +10,10 @@ const smsSummaryEntrySchema = new Schema({
   value: {
     type: new Schema(
       {
+        Name: {
+          type: String,
+          required: true,
+        },
         Phone: {
           type: String,
           required: true,
@@ -32,7 +36,16 @@ const smsSummaryEntrySchema = new Schema({
 
 const emailSummaryEntrySchema = new Schema(
   {
+    Name: {
+      type: String,
+      required: true,
+    },
     Email: {
+      type: String,
+      required: true,
+    },
+
+    reason: {
       type: String,
       required: true,
     },

@@ -26,8 +26,8 @@ sendQueue.process(async (job) => {
         { _id: taskId },
         {
           status: "completed",
-          summary: summary, // Make sure this summary is structured according to the summarySchema
-          tableData: [], // Set tableData to an empty array or use $unset to remove the field
+          summary: summary, 
+          tableData: [], 
         }
       );
 

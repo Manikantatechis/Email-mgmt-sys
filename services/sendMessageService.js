@@ -67,6 +67,7 @@ async function sendMessagesService(userId, actionType, actionData, tableData, sc
       scheduled
     );
   }
+  console.log('smsSummary', smsSummary)
 
   const summary = { smsSummary, emailSummary };
   return summary;

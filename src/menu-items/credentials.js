@@ -20,14 +20,6 @@ const Credentials = {
       url: '/credentials',
       icon: icons.MailOutlined
     }
-    // {
-    //   id: 'kixie',
-    //   title: 'Kixie',
-    //   type: 'item',
-    //   url: 'kixie/list',
-    //   icon: icons.PhoneOutlined
-    // }
-    ,
   ]
 };
 

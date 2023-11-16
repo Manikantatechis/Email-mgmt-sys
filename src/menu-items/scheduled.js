@@ -1,10 +1,6 @@
 // assets
-import { MailOutlined } from '@ant-design/icons';
+import { ScheduleOutlined } from '@ant-design/icons'
 
-// icons
-const icons = {
-  MailOutlined
-};
 
 // ==============================|| MENU ITEMS - SAMPLE PAGE & kixie ||============================== //
 
@@ -14,19 +10,12 @@ const Scheduled = {
   type: 'group',
   children: [
     {
-      id: 'gmail',
+      id: 'scheduled',
       title: `Scheduled List`,
       type: 'item',
       url: '/scheduled',
-      icon: icons.MailOutlined
+      icon: ScheduleOutlined
     }
-    // {
-    //   id: 'kixie',
-    //   title: 'Kixie',
-    //   type: 'item',
-    //   url: 'kixie/list',
-    //   icon: icons.PhoneOutlined
-    // }
   ]
 };
 

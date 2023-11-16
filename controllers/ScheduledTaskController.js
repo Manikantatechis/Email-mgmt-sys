@@ -2,8 +2,11 @@ const asyncHandler = require("express-async-handler");
 const ScheduledTask = require("../models/scheduledTaskModel");
 const { sendQueue } = require("../tasks/scheduler");
 
+
+
 // Get a list of all pending and completed tasks for a user with specific fields
 const getAllScheduledTasks = asyncHandler(async (req, res) => {
+
   try {
     const userId = req.userId;
     const role = req.role;
@@ -19,7 +22,7 @@ const getAllScheduledTasks = asyncHandler(async (req, res) => {
 
     const tasks = await ScheduledTask.find(
       query,
-      "_id actionType scheduledTime status summary tableData "
+      "_id userId actionType scheduledTime status summary tableData "
     )
       .sort({ _id: -1 })
       .lean()
@@ -44,6 +47,7 @@ const getAllScheduledTasks = asyncHandler(async (req, res) => {
 
       return {
         _id: task._id,
+        userId:task.userId,
         type: task.actionType,
         count:
           task.status === "completed"

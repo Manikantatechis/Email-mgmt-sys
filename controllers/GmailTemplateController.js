@@ -76,14 +76,10 @@ const editGmailTemplate = asyncHandler(async (req, res) => {
 
 // Delete Gmail Template
 const deleteGmailTemplate = asyncHandler(async (req, res) => {
-  const { role, userId } = req;
   const { id } = req.params;
 
-  if ((role !== "manager" && role !== "director") || !template_type) {
-    throw new Error("Access forbidden: insufficient role");
-  }
 
-  const template = await GmailTemplate.findOneAndDelete({ _id: id, userId });
+  const template = await GmailTemplate.findOneAndDelete({ _id: id});
 
   if (!template) {
     throw new Error("GMAIL Template not found");

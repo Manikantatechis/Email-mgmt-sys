@@ -2,31 +2,61 @@ const asyncHandler = require("express-async-handler");
 const ScheduledTask = require("../models/scheduledTaskModel");
 const { sendQueue } = require("../tasks/scheduler");
 
-
-
 // Get a list of all pending and completed tasks for a user with specific fields
 const getAllScheduledTasks = asyncHandler(async (req, res) => {
-
+  let { page, pageSize } = req.query;
   try {
+    page = parseInt(page, 10) || 1;
+    pageSize = parseInt(pageSize, 10) || 50;
+    console.log(req.query)
+
     const userId = req.userId;
     const role = req.role;
-    console.log(role)
+    console.log(role);
     const query = {};
 
-    if (role === "director" || role ==="manager") {
+    if (role === "director" || role === "manager") {
       query.status = { $in: ["pending", "completed"] };
     } else {
       query.userId = userId;
       query.status = { $in: ["pending", "completed"] };
     }
 
-    const tasks = await ScheduledTask.find(
-      query,
-      "_id userId actionType scheduledTime status summary tableData "
-    )
-      .sort({ _id: -1 })
-      .lean()
-      .exec();
+    const results = await ScheduledTask.aggregate([
+      { $match: query },
+      {
+        $facet: {
+          metadata: [{ $count: "totalCount" }],
+          data: [
+            { $sort: { _id: -1 } },
+            { $skip: (page - 1) * pageSize },
+            { $limit: pageSize },
+            {
+              $project: {
+                _id: 1,
+                userId: 1,
+                actionType: 1,
+                scheduledTime: 1,
+                status: 1,
+                summary: 1,
+                tableData: 1,
+              },
+            },
+          ],
+        },
+      },
+    ]);
+
+    // const tasks = await ScheduledTask.find(
+    //   query,
+    //   "_id userId actionType scheduledTime status summary tableData "
+    // )
+    //   .sort({ _id: -1 })
+    //   .lean()
+    //   .exec();
+
+    const totalCount = results[0].metadata.length > 0 ? results[0].metadata[0].totalCount : 0;
+    const tasks = results[0].data;
 
     // Map the tasks to include specific fields and conditionally include summary._id
     const transformedTasks = tasks.map((task) => {
@@ -47,7 +77,7 @@ const getAllScheduledTasks = asyncHandler(async (req, res) => {
 
       return {
         _id: task._id,
-        userId:task.userId,
+        userId: task.userId,
         type: task.actionType,
         count:
           task.status === "completed"
@@ -61,6 +91,7 @@ const getAllScheduledTasks = asyncHandler(async (req, res) => {
 
     res.status(200).json({
       success: true,
+      metadata: { totalCount, page, pageSize },
       data: transformedTasks,
     });
   } catch (error) {

@@ -80,10 +80,7 @@ const updateTemplate = asyncHandler(async (req, res) => {
 });
 
 const deleteTemplate = asyncHandler(async (req, res) => {
-  const { role, params, body } = req;
-
-  body.template_type = assignTemplateType(role, body.template_type);
-
+  const { params } = req;
   const deletedTemplate = await KixieTemplate.findByIdAndDelete(
     params.templateId
   );
@@ -91,7 +88,11 @@ const deleteTemplate = asyncHandler(async (req, res) => {
   if (!deletedTemplate) {
     return res.status(404).json({ error: "Template not found" });
   }
-  res.status(204).send();
+  message = {message:"Template Deleted successfully"}
+  res.status(200).json(message);
+
+  console.log(res.data)
+
 });
 
 module.exports = {

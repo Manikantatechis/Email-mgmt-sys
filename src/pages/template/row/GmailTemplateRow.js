@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { TableCell, TableRow, Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid } from '@mui/material';
 
-const GmailTemplateRow = ({index, _id, subject, html, content, status, template_type, cc, bcc, role, type, handleGmailTemplateEdit }) => {
+const GmailTemplateRow = ({index, _id, subject, html, content, status, template_type, cc, bcc, role, type, handleGmailTemplateEdit, handleGmailTemplateDelete }) => {
 
   const [showPreview, setShowPreview] = useState(false);
 
@@ -42,7 +42,11 @@ const GmailTemplateRow = ({index, _id, subject, html, content, status, template_
 
       <TableCell>
         {(role === 'manager' || role === 'director' || template_type === 'personal') && (
+          <>
           <Button onClick={() => handleGmailTemplateEdit(_id)}>Edit</Button>
+          <Button onClick={() => handleGmailTemplateDelete(_id)}>Delete</Button>
+          
+          </>
         )}
  </TableCell>
  <TableCell>

@@ -3,17 +3,39 @@ import { Button, Container, Paper, Table, TableBody, TableCell, TableContainer, 
 import GmailTemplateRow from './row/GmailTemplateRow';
 import { useDispatch, useSelector } from 'react-redux';
 import { getGmailTemplates, getKixieTemplates } from 'store/templates/templateThunk';
-import { selectGmailTemplates, selectIsGmailLoading } from 'store/templates/templateSlice';
+import { deleteTemplate, selectGmailTemplates, selectIsGmailLoading } from 'store/templates/templateSlice';
 import AddGmailTemplate from './AddGmailTemplate';
+// import { deleteGmailTemplate } from 'services/templateService';
+import AlertDialog from 'components/alerts/confirmDelete';
+import { deleteGmailTemplate } from 'services/templateService';
 
 const TemplateManager = () => {
   const [isGmailTemplateOpen, setIsGmailTemplateOpen] = useState(null);
   const [actionType, setActionType] = useState(null);
+  const [templateId, setTemplateId] = useState()
+  const [open, setOpen] = useState(false)
 
   const handleGmailTemplateEdit = (id) => {
     setActionType({ id, type: 'edit' });
     setIsGmailTemplateOpen(true);
   };
+
+  const handleGmailTemplateDelete = async(id)=>{
+    setTemplateId(id)
+    setOpen(true)
+    
+    
+  }
+
+  const confirmDelete =async(id)=>{
+    const res = await deleteGmailTemplate(id)
+    console.log(res)
+    if(res){
+      dispatch(deleteTemplate({type:"gmail", id}))
+    }
+  }
+
+
 
   const gmailTemplates = useSelector(selectGmailTemplates);
 
@@ -61,12 +83,13 @@ const TemplateManager = () => {
               {gmailTemplates &&
                 gmailTemplates.length > 0 &&
                 gmailTemplates.map((template, index) => (
-                  <GmailTemplateRow key={template.id} {...template} index = {index} role={role} handleGmailTemplateEdit={handleGmailTemplateEdit} />
+                  <GmailTemplateRow key={template.id} {...template} index = {index} role={role} handleGmailTemplateEdit={handleGmailTemplateEdit} handleGmailTemplateDelete={handleGmailTemplateDelete} />
                 ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
+      {open && <AlertDialog id={templateId} confirmDelete={confirmDelete} open={open} setOpen={setOpen} />}
 
       {isGmailTemplateOpen && <AddGmailTemplate setIsGmailTemplateOpen={setIsGmailTemplateOpen} role={role} actionType={actionType} />}
     </Container>

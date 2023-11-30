@@ -3,7 +3,17 @@ import React, { useState } from 'react';
 import { TableCell, TableRow, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import truncateWithEllipsis from 'utils/truncate';
 
-const KixieTemplateRow = ({index, _id, name, content, status, template_type, role, handleKixieTemplateEdit }) => {
+const KixieTemplateRow = ({
+  index,
+  _id,
+  name,
+  content,
+  status,
+  template_type,
+  role,
+  handleKixieTemplateEdit,
+  handleKixieTemplateDelete
+}) => {
   const [showPreview, setShowPreview] = useState(false);
 
   return (
@@ -12,16 +22,20 @@ const KixieTemplateRow = ({index, _id, name, content, status, template_type, rol
       <TableCell>{name}</TableCell>
       <TableCell>{truncateWithEllipsis(content, 150)}</TableCell>
       <TableCell>{status}</TableCell>
-      <TableCell style={{ width: '25%' }}>
+      <TableCell >
         {(role === 'director' || role === 'manager' || template_type === 'personal') && (
-          <Button onClick={() => handleKixieTemplateEdit(_id)}>Edit</Button>
+          <>
+            <Button onClick={() => handleKixieTemplateEdit(_id)}>Edit</Button>
+            <Button onClick={() => handleKixieTemplateDelete(_id)}>Delete</Button>
+          </>
         )}
-
+      </TableCell>
+      <TableCell>
         <Button onClick={() => setShowPreview(true)}>Preview</Button>
 
         <Dialog open={showPreview} onClose={() => setShowPreview(false)}>
           <DialogTitle sx={{ fontWeight: 'bold' }}>Preview</DialogTitle>
-          
+
           <DialogContent>{content}</DialogContent>
           <DialogActions>
             <Button onClick={() => setShowPreview(false)}>Close</Button>
@@ -29,7 +43,7 @@ const KixieTemplateRow = ({index, _id, name, content, status, template_type, rol
         </Dialog>
       </TableCell>
     </TableRow>
-  ); 
+  );
 };
 
 export default KixieTemplateRow;

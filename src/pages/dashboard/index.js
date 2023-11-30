@@ -9,6 +9,7 @@ import MainCard from 'components/MainCard';
 import AnalyticEcommerce from 'components/cards/statistics/AnalyticEcommerce';
 import { useSelector } from '../../../node_modules/react-redux/es/exports';
 import { selectTotalEmailsOpened, selectTotalEmailsSent, selectTotalSMSSent } from 'store/reports/reportsSlice';
+import AnimateButton from 'components/@extended/AnimateButton';
 
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
@@ -20,15 +21,17 @@ const DashboardDefault = () => {
   const totalEmailsOpened = useSelector(selectTotalEmailsOpened) || localStorage.getItem('totalEmailsOpened');
   const totalSMSSent = useSelector(selectTotalSMSSent) || localStorage.getItem('totalSMSSent');
 
-  const percentage = (totalEmailsOpened/totalEmailsSent*100).toFixed(2)
-
+  const percentage = ((totalEmailsOpened / totalEmailsSent) * 100).toFixed(2);
 
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
       <Stack direction="row" alignItems="center" spacing={0} sx={{ position: 'fixed', top: '15vh', right: '5vw' }}>
+       
+        <AnimateButton type="scale">
         <Button size="medium" onClick={() => setRefresh(true)} color="primary" variant="contained">
           Refresh
         </Button>
+        </AnimateButton>
       </Stack>
       {/* row 1 */}
       <Grid item xs={12} sx={{ mb: -2.25 }}>

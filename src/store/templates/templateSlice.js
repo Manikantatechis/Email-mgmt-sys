@@ -37,7 +37,16 @@ const templateSlice = createSlice({
           return template;
         });
       }
+    },
+    deleteTemplate: (state, action) => {
+      if (action.payload.type === "gmail") {
+        state.gmailTemplates = state.gmailTemplates.filter(template => template._id !== action.payload.id);
+      }
+      if (action.payload.type === "kixie") {
+        state.kixieTemplates = state.kixieTemplates.filter(template => template._id !== action.payload.id);
+      }
     }
+    
     
         
   },
@@ -80,7 +89,7 @@ export const selectKixieTemplates = state => state.templates.kixieTemplates
 
 
 
-export const {addTemplate, editTemplate} = templateSlice.actions
+export const {addTemplate, editTemplate, deleteTemplate} = templateSlice.actions
 
 
 

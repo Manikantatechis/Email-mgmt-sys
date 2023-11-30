@@ -1,7 +1,7 @@
 import { handleRequest } from './Api';
 
-export const getAllScheduledTasks = async () => {
-  return await handleRequest('get', '/api/schedule/list');
+export const getAllScheduledTasks = async (pageSize, page) => {
+  return await handleRequest('get', `/api/schedule/list?pageSize=${pageSize}&&page=${page}`);
 };
 
 export const cancelScheduledTask = async (id) => {

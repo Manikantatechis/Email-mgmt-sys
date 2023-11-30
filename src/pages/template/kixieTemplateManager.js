@@ -3,19 +3,34 @@ import { Button, Container, Paper, Table, TableBody, TableCell, TableContainer, 
 import KixieTemplateRow from './row/KixieTemplateRow';
 import { useDispatch, useSelector } from 'react-redux';
 import { getGmailTemplates, getKixieTemplates } from 'store/templates/templateThunk';
-import { selectIsKixieLoading, selectKixieTemplates } from 'store/templates/templateSlice';
+import { deleteTemplate, selectIsKixieLoading, selectKixieTemplates } from 'store/templates/templateSlice';
 import AddKixieTempate from './AddKixieTemplate';
+import { deleteKixieTemplate } from 'services/templateService';
+import AlertDialog from 'components/alerts/confirmDelete';
 
 const TemplateManager = () => {
   const [isKixieTemplateOpen, setIsKixieTemplateOpen] = useState(null);
   const [actionType, setActionType] = useState(null)
+  const [open, setOpen] = useState()
+  const [templateId, setTemplateId] = useState()
 
   const handleKixieTemplateEdit = (id)=>{
     setActionType({id, type:'edit'})
     setIsKixieTemplateOpen(true)
     
   }
+  const handleKixieTemplateDelete = (id)=>{
+    setTemplateId(id)
+    setOpen(true)
+  }
 
+  const confirmDelete = async(id)=>{
+    const res = await deleteKixieTemplate(id)
+    console.log(res)
+    if(res){
+      dispatch(deleteTemplate({type:"kixie", id}))
+    }
+  }
   const kixieTemplates = useSelector(selectKixieTemplates);
   const isKixieLoading = useSelector(selectIsKixieLoading);
 
@@ -47,21 +62,26 @@ const TemplateManager = () => {
           <Table>
             <TableHead>
               <TableRow>
+              <TableCell style={{whiteSpace:"nowrap"}}>SL NO</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Content</TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell >Actions</TableCell>
+                <TableCell >Preview</TableCell>
+
               </TableRow>
             </TableHead>
             <TableBody>
               {kixieTemplates &&
                 kixieTemplates.length > 0 &&
-                kixieTemplates.map((template, index) => <KixieTemplateRow key={template.id} index= {index} {...template} role={role} handleKixieTemplateEdit={handleKixieTemplateEdit} />)}
+                kixieTemplates.map((template, index) => <KixieTemplateRow key={template.id} index= {index} {...template} role={role} handleKixieTemplateEdit={handleKixieTemplateEdit} handleKixieTemplateDelete={handleKixieTemplateDelete} />)}
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
       {isKixieTemplateOpen && <AddKixieTempate setIsKixieTemplateOpen={setIsKixieTemplateOpen} role={role} actionType={actionType} />}
+
+      {open && <AlertDialog id={templateId} open={open} setOpen={setOpen} confirmDelete={confirmDelete} />}
 
     </Container>
   );

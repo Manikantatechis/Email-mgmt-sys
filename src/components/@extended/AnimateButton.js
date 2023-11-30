@@ -5,18 +5,30 @@ import { motion } from 'framer-motion';
 
 // ==============================|| ANIMATION BUTTON ||============================== //
 
-export default function AnimateButton({ children, type }) {
+export default function AnimateButton({ children,  type }) {
+  let animationProps = {};
   switch (type) {
-    case 'rotate': // only available in paid version
-    case 'slide': // only available in paid version
-    case 'scale': // only available in paid version
+    case 'rotate':
+      animationProps = { whileHover: { rotate: 360 }, whileTap: { rotate: 0 } };
+      break;
+    case 'slide':
+      animationProps = { whileHover: { x: 5 }, whileTap: { x: 0 } };
+      break;
+    case 'scale':
+      animationProps = { whileHover: { scale: 1 }, whileTap: { scale: 0.9 } };
+      break;
     default:
-      return (
-        <motion.div whileHover={{ scale: 1 }} whileTap={{ scale: 0.9 }}>
-          {children}
-        </motion.div>
-      );
+      animationProps = { whileHover: { scale: 1 }, whileTap: { scale: 0.9 } };
+      break;
   }
+
+
+  return (
+    <motion.div {...animationProps}>
+      {children}
+    </motion.div>
+  );
+  
 }
 
 AnimateButton.propTypes = {

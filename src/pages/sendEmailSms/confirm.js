@@ -172,14 +172,16 @@ const Confirm = ({ actionType, setActionType, tableData, setResData, loadingSend
     const currentTime = new Date();
     const tenMinutesLater = new Date(currentTime.getTime() + 10 * 60 * 1000);
 
+    console.log()
+
     if (isScheduled && !selectedDateTime) {
       errorState.schedulingTimeError = true;
       errorCount += 1;
-    } else if (selectedDateTime > tenMinutesLater) {
-      errorState.schedulingTimeError = false;
-    } else {
+    } else if ( isScheduled && selectedDateTime < tenMinutesLater) {
       errorState.schedulingTimeError = true;
       errorCount += 1;
+    } else {
+      errorState.schedulingTimeError = false;
     }
 
     setErrors(errorState);
